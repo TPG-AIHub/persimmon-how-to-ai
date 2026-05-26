@@ -23,7 +23,6 @@
     --orange-light: #FEF3E6;
     --blue-light: #EAF0F7;
     --purple-light: #F3EBF0;
-    /* Resource type tag colors */
     --tag-tutorial: #2F7A4A;
     --tag-tutorial-bg: #E6F5ED;
     --tag-explainer: #114973;
@@ -52,51 +51,69 @@
     background: var(--orange);
   }
 
-  /* ── Header ── */
-  .site-header {
+  /* ── Hero ── */
+  .hero {
     background: var(--navy);
-    padding: 0 48px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: relative;
+    overflow: hidden;
+    padding: 60px 48px 52px;
   }
 
-  .header-inner {
+  .hero-inner {
     max-width: 1200px;
     margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 68px;
+    position: relative;
+    z-index: 1;
   }
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+  .hero-network {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
   }
 
-  .logo-text {
+  .hero-brand {
     font-family: 'Century Gothic', Arial, sans-serif;
-    font-size: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--taupe);
+    margin-bottom: 14px;
+  }
+
+  .hero h1 {
+    font-family: 'Century Gothic', Arial, sans-serif;
+    font-size: 42px;
     font-weight: 700;
     color: #FFFFFF;
-    letter-spacing: 0.02em;
+    line-height: 1.1;
+    margin-bottom: 16px;
   }
 
-  .logo-text span {
+  .hero h1 span {
     color: var(--orange);
-    font-weight: 400;
   }
 
-  .search-bar {
+  .hero .subtitle {
+    font-size: 17px;
+    color: rgba(255,255,255,0.6);
+    max-width: 480px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  .hero .search-bar {
     position: relative;
-    width: 300px;
+    width: 340px;
   }
 
-  .search-bar input {
+  .hero .search-bar input {
     width: 100%;
-    padding: 9px 16px 9px 38px;
+    padding: 10px 16px 10px 40px;
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 6px;
     font-family: Arial, sans-serif;
@@ -107,135 +124,19 @@
     transition: all 0.2s;
   }
 
-  .search-bar input:focus {
+  .hero .search-bar input:focus {
     background: rgba(255,255,255,0.14);
     border-color: var(--orange);
   }
 
-  .search-bar input::placeholder { color: rgba(255,255,255,0.45); }
+  .hero .search-bar input::placeholder { color: rgba(255,255,255,0.45); }
 
-  .search-bar svg {
+  .hero .search-bar svg {
     position: absolute;
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
     color: rgba(255,255,255,0.4);
-  }
-
-  /* ── Hero ── */
-  .hero {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 48px 48px 0;
-  }
-
-  .whats-new-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--orange-light);
-    color: var(--orange);
-    font-family: 'Century Gothic', Arial, sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 6px 16px;
-    border-radius: 4px;
-    margin-bottom: 20px;
-  }
-
-  .whats-new-label .dot {
-    width: 6px;
-    height: 6px;
-    background: var(--orange);
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  .hero h1 {
-    font-family: 'Century Gothic', Arial, sans-serif;
-    font-size: 34px;
-    font-weight: 700;
-    color: var(--navy);
-    margin-bottom: 8px;
-  }
-
-  .hero .subtitle {
-    font-size: 16px;
-    color: var(--text-secondary);
-    max-width: 560px;
-    margin-bottom: 32px;
-  }
-
-  /* ── Featured Cards ── */
-  .featured-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 48px;
-  }
-
-  .featured-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .featured-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--orange);
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-
-  .featured-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-  }
-
-  .featured-card:hover::before { opacity: 1; }
-
-  .featured-card .card-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-
-  .featured-card .card-date {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-
-  .featured-card h3 {
-    font-family: 'Century Gothic', Arial, sans-serif;
-    font-size: 19px;
-    font-weight: 700;
-    color: var(--navy);
-    margin-bottom: 8px;
-    line-height: 1.3;
-  }
-
-  .featured-card p {
-    font-size: 14px;
-    color: var(--text-secondary);
-    line-height: 1.55;
   }
 
   /* ── Tags ── */
@@ -254,25 +155,16 @@
   .tag-explainer { background: var(--tag-explainer-bg); color: var(--tag-explainer); }
   .tag-news { background: var(--tag-news-bg); color: var(--tag-news); }
 
-  /* ── Filter Bar ── */
+  /* ── Content Section ── */
   .content-section {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 48px 64px;
+    padding: 28px 48px 64px;
   }
 
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  /* ── Filter Bar ── */
+  .filter-bar {
     margin-bottom: 24px;
-  }
-
-  .section-header h2 {
-    font-family: 'Century Gothic', Arial, sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--navy);
   }
 
   .filter-pills {
@@ -322,6 +214,8 @@
     display: flex;
     flex-direction: column;
     border-left: 3px solid transparent;
+    text-decoration: none;
+    color: inherit;
   }
 
   .resource-card:hover {
@@ -331,9 +225,6 @@
   }
 
   .resource-card .card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     margin-bottom: 14px;
   }
 
@@ -350,47 +241,31 @@
 
   .resource-card h3 {
     font-family: 'Century Gothic', Arial, sans-serif;
-    font-size: 15px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--navy);
-    margin-bottom: 8px;
-    line-height: 1.35;
+    margin-bottom: 10px;
+    line-height: 1.3;
   }
 
   .resource-card p {
-    font-size: 13.5px;
+    font-size: 15.5px;
     color: var(--text-secondary);
-    line-height: 1.55;
+    line-height: 1.6;
     flex: 1;
   }
 
+  .resource-card .card-date {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 14px;
+  }
+
   .resource-card .card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 16px;
+    margin-top: 14px;
     padding-top: 14px;
     border-top: 1px solid var(--border-light);
   }
-
-  .resource-card .card-date {
-    font-size: 12px;
-    color: var(--text-muted);
-  }
-
-  .resource-card .read-link {
-    font-family: 'Century Gothic', Arial, sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--orange);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    transition: gap 0.2s;
-  }
-
-  .resource-card:hover .read-link { gap: 8px; }
 
   /* ── Empty state ── */
   .empty-state {
@@ -413,12 +288,10 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .featured-card, .resource-card {
+  .resource-card {
     animation: fadeUp 0.5s ease both;
   }
 
-  .featured-card:nth-child(1) { animation-delay: 0.05s; }
-  .featured-card:nth-child(2) { animation-delay: 0.1s; }
   .resource-card:nth-child(1) { animation-delay: 0.1s; }
   .resource-card:nth-child(2) { animation-delay: 0.15s; }
   .resource-card:nth-child(3) { animation-delay: 0.2s; }
@@ -446,17 +319,14 @@
 
   /* ── Responsive ── */
   @media (max-width: 900px) {
-    .featured-grid { grid-template-columns: 1fr; }
     .resource-grid { grid-template-columns: repeat(2, 1fr); }
     .hero, .content-section { padding-left: 24px; padding-right: 24px; }
-    .site-header { padding: 0 24px; }
+    .hero .search-bar { width: 100%; }
   }
 
   @media (max-width: 600px) {
     .resource-grid { grid-template-columns: 1fr; }
-    .search-bar { width: 200px; }
-    .hero h1 { font-size: 26px; }
-    .section-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .hero h1 { font-size: 30px; }
   }
 </style>
 </head>
@@ -464,34 +334,74 @@
 
 <div class="top-bar"></div>
 
-<!-- ── Header ── -->
-<header class="site-header">
-  <div class="header-inner">
-    <div class="logo">
-      <div class="logo-text">THE PERSIMMON GROUP <span>How to AI</span></div>
-    </div>
+<!-- ── Hero ── -->
+<section class="hero">
+  <svg class="hero-network" viewBox="0 0 1200 240" preserveAspectRatio="xMidYMid slice">
+    <!-- Network connections -->
+    <line x1="720" y1="55" x2="850" y2="95" stroke="rgba(239,129,31,0.12)" stroke-width="1"/>
+    <line x1="850" y1="95" x2="940" y2="50" stroke="rgba(239,129,31,0.10)" stroke-width="1"/>
+    <line x1="850" y1="95" x2="920" y2="155" stroke="rgba(239,129,31,0.08)" stroke-width="1"/>
+    <line x1="920" y1="155" x2="1050" y2="125" stroke="rgba(239,129,31,0.10)" stroke-width="1"/>
+    <line x1="940" y1="50" x2="1060" y2="72" stroke="rgba(239,129,31,0.07)" stroke-width="1"/>
+    <line x1="720" y1="55" x2="780" y2="140" stroke="rgba(239,129,31,0.09)" stroke-width="1"/>
+    <line x1="780" y1="140" x2="920" y2="155" stroke="rgba(239,129,31,0.07)" stroke-width="1"/>
+    <line x1="1050" y1="125" x2="1100" y2="195" stroke="rgba(239,129,31,0.06)" stroke-width="1"/>
+    <line x1="780" y1="140" x2="720" y2="195" stroke="rgba(239,129,31,0.06)" stroke-width="1"/>
+    <line x1="850" y1="95" x2="810" y2="35" stroke="rgba(239,129,31,0.07)" stroke-width="1"/>
+    <line x1="1050" y1="125" x2="1130" y2="85" stroke="rgba(239,129,31,0.08)" stroke-width="1"/>
+    <line x1="1130" y1="85" x2="1160" y2="140" stroke="rgba(239,129,31,0.05)" stroke-width="1"/>
+    <!-- Secondary cluster -->
+    <line x1="600" y1="180" x2="720" y2="195" stroke="rgba(172,160,149,0.06)" stroke-width="1"/>
+    <line x1="720" y1="195" x2="800" y2="215" stroke="rgba(172,160,149,0.05)" stroke-width="1"/>
+    <line x1="920" y1="155" x2="880" y2="210" stroke="rgba(172,160,149,0.05)" stroke-width="1"/>
+    <line x1="650" y1="30" x2="720" y2="55" stroke="rgba(172,160,149,0.04)" stroke-width="1"/>
+    <!-- Primary nodes (double-circle glow) -->
+    <circle cx="720" cy="55" r="4" fill="rgba(239,129,31,0.25)"/>
+    <circle cx="720" cy="55" r="1.8" fill="rgba(239,129,31,0.6)"/>
+    <circle cx="850" cy="95" r="5" fill="rgba(239,129,31,0.20)"/>
+    <circle cx="850" cy="95" r="2.2" fill="rgba(239,129,31,0.55)"/>
+    <circle cx="940" cy="50" r="3.5" fill="rgba(239,129,31,0.18)"/>
+    <circle cx="940" cy="50" r="1.5" fill="rgba(239,129,31,0.5)"/>
+    <circle cx="920" cy="155" r="4.5" fill="rgba(239,129,31,0.15)"/>
+    <circle cx="920" cy="155" r="2" fill="rgba(239,129,31,0.45)"/>
+    <circle cx="1050" cy="125" r="3" fill="rgba(239,129,31,0.15)"/>
+    <circle cx="1050" cy="125" r="1.3" fill="rgba(239,129,31,0.45)"/>
+    <circle cx="780" cy="140" r="3.5" fill="rgba(239,129,31,0.13)"/>
+    <circle cx="780" cy="140" r="1.5" fill="rgba(239,129,31,0.4)"/>
+    <circle cx="1060" cy="72" r="2.5" fill="rgba(239,129,31,0.10)"/>
+    <circle cx="1060" cy="72" r="1" fill="rgba(239,129,31,0.35)"/>
+    <circle cx="810" cy="35" r="2.5" fill="rgba(239,129,31,0.10)"/>
+    <circle cx="810" cy="35" r="1" fill="rgba(239,129,31,0.35)"/>
+    <circle cx="1130" cy="85" r="2.5" fill="rgba(239,129,31,0.10)"/>
+    <circle cx="1130" cy="85" r="1" fill="rgba(239,129,31,0.35)"/>
+    <!-- Faint scatter nodes -->
+    <circle cx="720" cy="195" r="2.5" fill="rgba(172,160,149,0.12)"/>
+    <circle cx="720" cy="195" r="1" fill="rgba(172,160,149,0.3)"/>
+    <circle cx="1100" cy="195" r="2" fill="rgba(172,160,149,0.10)"/>
+    <circle cx="1100" cy="195" r="0.8" fill="rgba(172,160,149,0.25)"/>
+    <circle cx="600" cy="180" r="2" fill="rgba(172,160,149,0.08)"/>
+    <circle cx="800" cy="215" r="1.5" fill="rgba(172,160,149,0.06)"/>
+    <circle cx="880" cy="210" r="1.5" fill="rgba(172,160,149,0.06)"/>
+    <circle cx="650" cy="30" r="1.5" fill="rgba(172,160,149,0.06)"/>
+    <circle cx="1160" cy="140" r="1.5" fill="rgba(172,160,149,0.05)"/>
+    <circle cx="1000" cy="200" r="1" fill="rgba(172,160,149,0.05)"/>
+    <circle cx="1080" cy="30" r="1" fill="rgba(172,160,149,0.04)"/>
+  </svg>
+
+  <div class="hero-inner">
+    <div class="hero-brand">The Persimmon Group</div>
+    <h1>How to <span>AI</span></h1>
+    <p class="subtitle">Persimmon explainers, tutorials, and hot takes to help you work smarter with AI.</p>
     <div class="search-bar">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="searchInput" placeholder="Search resources..." oninput="handleSearch(this.value)">
     </div>
   </div>
-</header>
-
-<!-- ── Hero ── -->
-<section class="hero">
-  <div class="whats-new-label"><span class="dot"></span> What's New</div>
-  <h1>How to AI</h1>
-  <p class="subtitle">Guides, tutorials, and references to help you work smarter with AI — updated as things change.</p>
-
-  <div class="featured-grid" id="featuredGrid">
-    <!-- Add your two featured cards here when you have resources to highlight -->
-  </div>
 </section>
 
 <!-- ── All Resources ── -->
 <section class="content-section">
-  <div class="section-header">
-    <h2>All Resources</h2>
+  <div class="filter-bar">
     <div class="filter-pills">
       <button class="filter-pill active" onclick="filterBy('all')">All</button>
       <button class="filter-pill" onclick="filterBy('explainer')">AI Explainers</button>
@@ -502,76 +412,71 @@
 
   <div class="resource-grid" id="resourceGrid">
 
-<div class="resource-card" data-category="Explainer" data-type="AI Explainers">
+<a class="resource-card" href="ai-beyond-the-chat-box.html" data-category="explainer" data-type="AI Explainers">
   <div class="card-top">
     <div class="card-icon">💡</div>
+  </div>
+  <h3>What AI Can Actually Do (Beyond Chat)</h3>
+  <p>You're already using the chat window. Here's what's happening behind it — and why it changes how you work.</p>
+  <div class="card-date">May 26, 2026</div>
+  <div class="card-footer">
     <span class="tag tag-explainer">AI Explainers</span>
   </div>
-  <h3>AI Beyond the Chat Box</h3>
-  <p>START HERE: You already know how to talk to AI. This is a short tour of what's happening beyond the chat window (and why you should care).</p>
-  <div class="card-footer">
-    <span class="card-date">5-26-2026</span>
-    <a class="read-link" href="ai-beyond-the-chat-box.html">Open →</a>
-  </div>
-</div>
+</a>
 
-<div class="resource-card" data-category="Explainer" data-type="AI Explainers">
+<a class="resource-card" href="skills-what-they-are-and-when-they-matter.html" data-category="explainer" data-type="AI Explainers">
   <div class="card-top">
-    <div class="card-icon">💡</div>
+    <div class="card-icon">⚡</div>
+  </div>
+  <h3>Skills: Your Shortcut to Skipping Repetitive Work</h3>
+  <p>ChatGPT's most underrated feature. What skills are, when they matter, and why you'll wish you'd started sooner.</p>
+  <div class="card-date">May 26, 2026</div>
+  <div class="card-footer">
     <span class="tag tag-explainer">AI Explainers</span>
   </div>
-  <h3>Your Guide to Skills</h3>
-  <p>Here's what you need to know about ChatGPT's best tool to speed up your work.</p>
-  <div class="card-footer">
-    <span class="card-date">5-26-2026</span>
-    <a class="read-link" href="skills-what-they-are-and-when-they-matter.html">Open →</a>
-  </div>
-</div>
-    
-    <div class="resource-card" data-category="Tutorial" data-type="AI Tutorials">
+</a>
+
+<a class="resource-card" href="how-to-build-a-skill-in-chatgpt.html" data-category="tutorial" data-type="AI Tutorials">
   <div class="card-top">
     <div class="card-icon">🛠️</div>
+  </div>
+  <h3>Build Your First Skill in 15 Minutes</h3>
+  <p>Three ways to build a skill — from scratch, from a conversation, or with the Skill Builder. Pick the one that fits.</p>
+  <div class="card-date">May 26, 2026</div>
+  <div class="card-footer">
     <span class="tag tag-tutorial">AI Tutorials</span>
   </div>
-  <h3>How to Build a Skill in ChatGPT</h3>
-  <p>Learn the three parts of every skill, see a complete working example, and build your own — from scratch, with the Skill Builder, or from a live conversation.</p>
-  <div class="card-footer">
-    <span class="card-date">5-26-2026</span>
-    <a class="read-link" href="how-to-build-a-skill-in-chatgpt.html">Open →</a>
-  </div>
-</div>
+</a>
 
-<div class="resource-card" data-category="Tutorial" data-type="AI Tutorials">
+<a class="resource-card" href="how-to-train-chatgpt-to-write-with-your-voice.html" data-category="tutorial" data-type="AI Tutorials">
   <div class="card-top">
     <div class="card-icon">🎙️</div>
+  </div>
+  <h3>Teach ChatGPT to Write Like You</h3>
+  <p>Stop rewriting every draft. Build a voice skill and get output that actually sounds like you wrote it.</p>
+  <div class="card-date">May 26, 2026</div>
+  <div class="card-footer">
     <span class="tag tag-tutorial">AI Tutorials</span>
   </div>
-  <h3>How to Train ChatGPT to Write with Your Voice</h3>
-  <p>Stop rewriting every draft. This step-by-step guide walks you through building a voice skill that teaches ChatGPT how you actually write.</p>
-  <div class="card-footer">
-    <span class="card-date">5-26-2026</span>
-    <a class="read-link" href="how-to-train-chatgpt-to-write-with-your-voice.html">Open →</a>
-  </div>
-</div>
+</a>
 
-<div class="resource-card" data-category="Explainer" data-type="AI Explainers">
+<a class="resource-card" href="why-ai-loses-the-thread.html" data-category="explainer" data-type="AI Explainers">
   <div class="card-top">
     <div class="card-icon">🧠</div>
-    <span class="tag tag-explainer">AI Explainers</span>
   </div>
   <h3>Why Long Chats Make ChatGPT Dumber</h3>
-  <p>ChatGPT's memory is a whiteboard with a fixed size. Learn why quality degrades in long conversations and how to keep it sharp.</p>
+  <p>It's not you — it's the context window. Here's why quality drops and three ways to fix it.</p>
+  <div class="card-date">May 26, 2026</div>
   <div class="card-footer">
-    <span class="card-date">5-26-2026</span>
-    <a class="read-link" href="why-ai-loses-the-thread.html">Open →</a>
+    <span class="tag tag-explainer">AI Explainers</span>
   </div>
-</div>
-    
+</a>
+
   </div>
 </section>
 
 <footer class="site-footer">
-  <p><strong>The Persimmon Group</strong> · How to AI · Last updated May 23, 2026 · Questions? Ask Sara.</p>
+  <p><strong>The Persimmon Group</strong> · How to AI · Last updated May 26, 2026 · Questions? Ask Sara.</p>
 </footer>
 
 <script>
@@ -581,10 +486,7 @@
     event.target.classList.add('active');
 
     const cards = document.querySelectorAll('.resource-card');
-    const featured = document.querySelectorAll('.featured-card');
-    const all = [...cards, ...featured];
-
-    all.forEach(card => {
+    cards.forEach(card => {
       if (category === 'all' || card.dataset.category === category) {
         card.style.display = '';
       } else {
@@ -597,12 +499,11 @@
   function handleSearch(query) {
     const q = query.toLowerCase().trim();
     const cards = document.querySelectorAll('.resource-card');
-    const featured = document.querySelectorAll('.featured-card');
 
     document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
     document.querySelector('.filter-pill').classList.add('active');
 
-    [...cards, ...featured].forEach(card => {
+    cards.forEach(card => {
       const text = card.textContent.toLowerCase();
       card.style.display = (!q || text.includes(q)) ? '' : 'none';
     });
