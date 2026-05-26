@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build a Voice Skill — How to AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --navy: #162431;
+    --orange: #EF811F;
+    --blue: #114973;
+    --red: #961B28;
+    --purple: #55233D;
+    --taupe: #ACA095;
+    --bg: #F7F6F4;
+    --surface: #FFFFFF;
+    --text-primary: #162431;
+    --text-secondary: #3A4A5A;
+    --text-muted: #6B7A8A;
+    --border: #D9D5CF;
+    --border-light: #E7E6E6;
+    --orange-light: #FEF3E6;
+    --blue-light: #EAF0F7;
+    --purple-light: #F3EBF0;
+    --sidebar-width: 300px;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'DM Sans', Arial, sans-serif;
+    color: var(--text-primary);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top-bar { height: 4px; background: var(--orange); flex-shrink: 0; }
+  .layout { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 28px 24px 24px;
+    border-bottom: 2px solid var(--orange);
+  }
+
+  .sidebar-brand {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--taupe);
+    margin-bottom: 6px;
+  }
+
+  .sidebar-title {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.2;
+  }
+
+  .sidebar-title span { color: var(--orange); }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+  .nav-group-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--taupe);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 20px 24px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); }
+
+  .nav-item.active {
+    background: rgba(239, 129, 31, 0.08);
+    border-left-color: var(--orange);
+  }
+
+  .nav-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    width: 24px;
+    text-align: center;
+  }
+
+  .nav-text { flex: 1; }
+
+  .nav-label {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: rgba(255,255,255,0.6);
+    display: block;
+  }
+
+  .nav-item.active .nav-label { color: #FFFFFF; }
+
+  .nav-desc {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.4;
+    margin-top: 3px;
+    display: block;
+  }
+
+  .nav-item.active .nav-desc { color: rgba(255,255,255,0.5); }
+
+  .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 11px;
+    color: var(--taupe);
+    text-align: center;
+  }
+
+  .sidebar-footer a { color: var(--orange); text-decoration: none; }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg);
+    scroll-behavior: smooth;
+  }
+
+  .main::-webkit-scrollbar { width: 6px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+  /* ── Content panel ── */
+  .panel {
+    display: none;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 48px 80px;
+    animation: panelIn 0.3s ease both;
+  }
+
+  .panel.active { display: block; }
+
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-number {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .panel h2 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .panel h3 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-top: 40px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .panel h3:first-of-type { margin-top: 28px; }
+
+  .panel p {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.8;
+  }
+
+  .panel strong { color: var(--text-primary); font-weight: 700; }
+  .panel em { font-style: italic; }
+
+  .panel ul, .panel ol {
+    margin-bottom: 20px;
+    padding-left: 24px;
+  }
+
+  .panel li {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    line-height: 1.7;
+  }
+
+  .lead-text {
+    font-size: 19px;
+    line-height: 1.7;
+    color: var(--navy);
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  .framing-quote {
+    font-size: 20px;
+    font-style: italic;
+    color: var(--navy);
+    font-weight: 600;
+    padding: 20px 0 20px 24px;
+    border-left: 4px solid var(--orange);
+    margin: 28px 0;
+    line-height: 1.5;
+  }
+
+  /* ── Panel nav ── */
+  .panel-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 2px solid var(--orange);
+  }
+
+  .panel-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .panel-nav-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .panel-nav-btn.hidden { visibility: hidden; }
+
+  /* ── Callout ── */
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 28px 0;
+    border-left: 4px solid var(--orange);
+    background: var(--orange-light);
+  }
+
+  .callout-label {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .callout p { font-size: 15px; color: var(--text-secondary); margin-bottom: 0; line-height: 1.65; }
+  .callout p + p { margin-top: 10px; }
+
+  .callout-warning { background: rgba(150, 27, 40, 0.04); border-left-color: var(--red); }
+  .callout-warning .callout-label { color: var(--red); }
+  .callout-info { background: var(--blue-light); border-left-color: var(--blue); }
+  .callout-info .callout-label { color: var(--blue); }
+  .callout-purple { background: var(--purple-light); border-left-color: var(--purple); }
+  .callout-purple .callout-label { color: var(--purple); }
+
+  /* ── Example block ── */
+  .example-block {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 24px 0;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 1px 3px rgba(22,36,49,0.04);
+  }
+  .example-label { font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); margin-bottom: 10px; }
+  .example-block p { font-size: 15px; line-height: 1.65; color: var(--text-secondary); margin-bottom: 0; }
+  .example-block p + p { margin-top: 10px; }
+
+  /* ── Card grid ── */
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+  .grid-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 20px 22px; box-shadow: 0 1px 3px rgba(22,36,49,0.04); transition: border-color 0.2s; }
+  /* hover removed — cards are not clickable */
+  .grid-card .card-emoji { font-size: 24px; margin-bottom: 10px; }
+  .grid-card h4 { font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .grid-card p { font-size: 14px; line-height: 1.55; color: var(--text-secondary); margin-bottom: 0; }
+
+  /* ── Comparison boxes ── */
+  .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .comparison-box { padding: 22px 24px; border-radius: var(--radius-sm); }
+  .comparison-box.without { background: #EEEDEB; border: 1px solid var(--border); }
+  .comparison-box.with { background: var(--orange-light); border: 1px solid rgba(239,129,31,0.25); }
+  .comparison-box h4 { font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .comparison-box.without h4 { color: var(--text-muted); }
+  .comparison-box.with h4 { color: var(--orange); }
+  .comparison-box p { font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 0; }
+
+  /* ── Numbered steps ── */
+  .steps { counter-reset: step; list-style: none; padding-left: 0; margin: 24px 0; }
+  .steps li { counter-increment: step; position: relative; padding-left: 52px; margin-bottom: 28px; }
+  .steps li::before { content: counter(step); position: absolute; left: 0; top: 2px; width: 36px; height: 36px; background: var(--navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 14px; font-weight: 700; }
+  .steps li strong { display: block; font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 16px; color: var(--navy); margin-bottom: 4px; }
+  .steps li p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0; }
+
+  /* ── Category cards (vertical) ── */
+  .category-card {
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 16px 0;
+    box-shadow: 0 1px 3px rgba(22,36,49,0.04);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .category-number {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--orange);
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 2px;
+    width: 36px;
+  }
+  .category-content { flex: 1; }
+  .category-content h4 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .category-content p {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+  }
+
+  /* ── Prompt block ── */
+  .prompt-block {
+    background: var(--surface);
+    border-left: 3px solid var(--orange);
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 14.5px;
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.65;
+    box-shadow: 0 1px 3px rgba(22,36,49,0.04);
+  }
+
+  /* ── Scope table ── */
+  .scope-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 15px;
+  }
+  .scope-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 2px solid var(--border);
+  }
+  .scope-table th:first-child { color: #2F7A4A; }
+  .scope-table th:last-child { color: var(--text-muted); }
+  .scope-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+  .scope-table tbody tr:last-child td { border-bottom: none; }
+
+  /* ── Go deeper links ── */
+  .go-deeper-list { list-style: none; padding: 0; margin: 24px 0; }
+  .go-deeper-list li {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .go-deeper-list li:last-child { border-bottom: none; }
+  .go-deeper-list a {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--blue);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .go-deeper-list a:hover { color: var(--orange); }
+  .go-deeper-list .link-desc {
+    display: block;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    html, body { overflow: auto; }
+    .layout { flex-direction: column; }
+    .main { overflow: visible; }
+    .panel { padding: 40px 24px 60px; }
+    .panel h2 { font-size: 26px; }
+    .comparison-grid, .card-grid { grid-template-columns: 1fr; }
+    .mobile-nav { display: flex; }
+  }
+
+  .mobile-nav {
+    display: none;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--navy);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-nav-btn {
+    flex-shrink: 0;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    background: none;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    padding: 6px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .mobile-nav-btn.active { background: var(--orange); color: white; border-color: var(--orange); }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<div class="layout">
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">The Persimmon Group</div>
+    <div class="sidebar-title">Build a <span>Voice Skill</span></div>
+  </div>
+  <div class="sidebar-nav" id="sidebarNav">
+
+    <a class="nav-item active" data-panel="intro">
+      <span class="nav-icon">🎯</span>
+      <span class="nav-text">
+        <span class="nav-label">Why Build a Voice Skill</span>
+        <span class="nav-desc">Stop rewriting every ChatGPT draft</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="where">
+      <span class="nav-icon">📬</span>
+      <span class="nav-text">
+        <span class="nav-label">Where It Helps Most</span>
+        <span class="nav-desc">Emails, client work, and external writing</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">The Build</div>
+
+    <a class="nav-item" data-panel="scope">
+      <span class="nav-icon">⚖️</span>
+      <span class="nav-text">
+        <span class="nav-label">Step 1: Scope Your Skill</span>
+        <span class="nav-desc">Registers, authorship, and exclusions</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="categories">
+      <span class="nav-icon">🏷️</span>
+      <span class="nav-text">
+        <span class="nav-label">Step 2: Learn the Categories</span>
+        <span class="nav-desc">Six dimensions that define a writing voice</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="analyze">
+      <span class="nav-icon">🔍</span>
+      <span class="nav-text">
+        <span class="nav-label">Step 3: Collect &amp; Analyze</span>
+        <span class="nav-desc">Gather samples and build your voice guide</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="build">
+      <span class="nav-icon">🔧</span>
+      <span class="nav-text">
+        <span class="nav-label">Step 4: Build the Skill</span>
+        <span class="nav-desc">Upload, review, install, and test</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Next Steps</div>
+
+    <a class="nav-item" data-panel="deeper">
+      <span class="nav-icon">📚</span>
+      <span class="nav-text">
+        <span class="nav-label">Go Deeper</span>
+        <span class="nav-desc">External resources and documentation</span>
+      </span>
+    </a>
+
+  </div>
+  <div class="sidebar-footer"><a href="index.html">&larr; Back to all resources</a></div>
+</nav>
+
+<!-- ── Mobile nav ── -->
+<div class="mobile-nav" id="mobileNav"></div>
+
+<!-- ── Main ── -->
+<main class="main" id="mainContent">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- INTRO                                   -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel active" id="panel-intro">
+    <div class="section-number">AI Tutorial</div>
+    <h2>Why Build a Voice Skill</h2>
+
+    <p class="lead-text">Right now, every time you ask ChatGPT to write something, you start from scratch. You describe your tone, paste in your preferences, cross your fingers. The output comes back sounding like a courteous stranger who studied your LinkedIn profile for thirty seconds.</p>
+
+    <p>A voice skill changes the dynamic. You teach ChatGPT how you write, once, and it remembers every time. No more re-explaining. No more rewriting drafts that were technically fine but sounded nothing like you.</p>
+
+    <div class="framing-quote">This tutorial walks through the full build, from scoping what the skill should cover to installing and testing it. Budget about 30 minutes for the initial setup.</div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn hidden">&larr; Previous</button>
+      <button class="panel-nav-btn" onclick="goTo('where')">Where It Helps Most &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- WHERE IT HELPS                          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-where">
+    <div class="section-number">AI Tutorial</div>
+    <h2>Where a Voice Skill Helps Most</h2>
+
+    <p class="lead-text">A voice skill pays off anywhere the writing needs to sound like it came from you. Some categories benefit more than others.</p>
+
+    <div class="example-block">
+      <div class="example-label">Emails and Messages</div>
+      <p>This is where you'll feel the difference first. Follow-ups, check-ins, scheduling, status updates. The everyday writing where "sounding like you" matters most. Instead of rewriting ChatGPT's output to sound less robotic, it gets your tone right on the first pass.</p>
+    </div>
+
+    <div class="example-block">
+      <div class="example-label">Client-Facing Work</div>
+      <p>Reports, proposals, course descriptions. These may use a more polished register than your emails, but they still benefit from consistency. When a client reads your deliverable, it should sound like it was written by the same person who sends them email.</p>
+    </div>
+
+    <div class="example-block">
+      <div class="example-label">Social Media and External Writing</div>
+      <p>LinkedIn posts, blog posts, anything external where your personality needs to come through. If you do this kind of writing, a voice skill makes a big difference.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('intro')">&larr; Why Build a Voice Skill</button>
+      <button class="panel-nav-btn" onclick="goTo('scope')">Step 1: Scope Your Skill &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- STEP 1: SCOPE                           -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-scope">
+    <div class="section-number">The Build — Step 1</div>
+    <h2>Scope Your Skill</h2>
+
+    <p class="lead-text">Before you collect writing samples or open ChatGPT, get clear on what the skill should and shouldn't do. Scoping up front saves you from rebuilding later.</p>
+
+    <h3>List your registers</h3>
+
+    <p>Think about the types of writing you do, then group them by tone. Emails and Teams messages might share one register (informal). Client status reports and deliverables might share another (formal). Start with two or three registers (or even just one core voice) and see whether you need more after testing.</p>
+
+    <div class="callout">
+      <div class="callout-label">What's a register?</div>
+      <p>A register is a version of your voice tuned for a specific context. You already shift registers naturally. You don't write a Slack message to your team the same way you write a project status email to a client. A voice skill can account for those shifts.</p>
+    </div>
+
+    <h3>Decide who the author is</h3>
+
+    <p>This is a question that matters more than it seems. Are <em>you</em> the author (emails, posts, updates) or is <em>Persimmon</em> the author (proposals, Insights articles, web copy)? This tutorial covers your personal voice. If you need a skill for Persimmon-authored content, that's a separate build (or a shared skill built for that purpose).</p>
+
+    <h3>Name what's excluded</h3>
+
+    <p>Decide what you do <strong>not</strong> want your skill to do. Exclusions prevent your skill from activating on the wrong task. For example: "Do not apply my personal voice to Persimmon marketing content."</p>
+
+    <table class="scope-table">
+      <thead>
+        <tr>
+          <th>✅ Use the skill</th>
+          <th>⏭️ Don't use the skill</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Emails you're sending as yourself</td>
+          <td>Proposals or deliverables written as Persimmon</td>
+        </tr>
+        <tr>
+          <td>Status updates in your own name</td>
+          <td>Templates or form letters</td>
+        </tr>
+        <tr>
+          <td>Messages to colleagues or clients</td>
+          <td>Research summaries or analysis</td>
+        </tr>
+        <tr>
+          <td>LinkedIn posts or blog drafts</td>
+          <td>Persimmon marketing content</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('where')">&larr; Where It Helps Most</button>
+      <button class="panel-nav-btn" onclick="goTo('categories')">Step 2: Learn the Categories &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- STEP 2: CATEGORIES                      -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-categories">
+    <div class="section-number">The Build — Step 2</div>
+    <h2>Learn the Categories</h2>
+
+    <p class="lead-text">Use these six categories to describe each register. In Step 3 you'll let ChatGPT help you fill them in — but it helps to know what you're looking for before you start.</p>
+
+    <div class="category-card">
+      <div class="category-number">01</div>
+      <div class="category-content">
+        <h4>Tone &amp; Qualities</h4>
+        <p>Warm or direct? Exploratory or authoritative? Casual or polished? Name the qualities with short examples of each.</p>
+      </div>
+    </div>
+
+    <div class="category-card">
+      <div class="category-number">02</div>
+      <div class="category-content">
+        <h4>Word Choice and Avoidance Rules</h4>
+        <p>Words you use. Words you never use. Be specific: "Never say 'strategic alignment' or 'circle back.'"</p>
+      </div>
+    </div>
+
+    <div class="category-card">
+      <div class="category-number">03</div>
+      <div class="category-content">
+        <h4>Perspective &amp; Pronoun Rules</h4>
+        <p>When do you say "you," "we," or third person? Set rules for each. For example: "Use 'we' when pointing out mistakes rather than 'you.'" As in, "When we get busy, it's easy to miss the obvious."</p>
+      </div>
+    </div>
+
+    <div class="category-card">
+      <div class="category-number">04</div>
+      <div class="category-content">
+        <h4>Rhetorical Devices and Sentence Style</h4>
+        <p>Parenthetical asides? Analogies? Dry humor? Short sentences mixed with long? ChatGPT will partially catch these from your samples, but you may need to clarify or refine.</p>
+      </div>
+    </div>
+
+    <div class="category-card">
+      <div class="category-number">05</div>
+      <div class="category-content">
+        <h4>Format Rules (Per Register)</h4>
+        <p>How do you structure an email vs. a post? Paragraph length, bullet style, how you open and close. These differ by register. That's the whole point of having registers.</p>
+      </div>
+    </div>
+
+    <div class="category-card">
+      <div class="category-number">06</div>
+      <div class="category-content">
+        <h4>Judgment Heuristics</h4>
+        <p>Rules you apply when editing your own work: "Read it aloud and check for accusatory language that could cause defensiveness." ChatGPT won't figure these out from your samples. You have to add them yourself.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-purple">
+      <div class="callout-label">Why six categories and not just "tone"</div>
+      <p>Telling ChatGPT "write in a professional but friendly tone" gives it almost nothing to work with. These six categories give it specific, concrete rules. The kind of detail that turns generic output into something that reads like something you wrote.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('scope')">&larr; Step 1: Scope Your Skill</button>
+      <button class="panel-nav-btn" onclick="goTo('analyze')">Step 3: Collect &amp; Analyze &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- STEP 3: COLLECT & ANALYZE              -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-analyze">
+    <div class="section-number">The Build — Step 3</div>
+    <h2>Collect &amp; Analyze Samples</h2>
+
+    <h3>Gather 3–5 full samples per register</h3>
+
+    <p>For each register, pull 3–5 <strong>complete</strong> pieces. Full emails, entire LinkedIn posts, whole report sections. Not snippets. One sample per format risks ChatGPT treating a single instance as the template for everything.</p>
+
+    <div class="callout">
+      <div class="callout-label">What counts as a good sample</div>
+      <p>Writing where you were being yourself. Not a template someone gave you. Not something you copied from a past deliverable. The emails and updates where you just wrote? Those are the ones you want.</p>
+    </div>
+
+    <h3>Ask ChatGPT to analyze each register</h3>
+
+    <p>Paste one register's samples into ChatGPT and use this prompt:</p>
+
+    <div class="prompt-block">"Analyze these writing samples. Describe my voice using these six categories: (1) Tone &amp; Qualities, (2) Word Choice &amp; Avoidance Rules, (3) Perspective &amp; Pronoun Rules, (4) Rhetorical Devices, (5) Format Rules, (6) Judgment Heuristics."</div>
+
+    <p>Repeat for each register.</p>
+
+    <h3>Edit into your voice guide</h3>
+
+    <p>ChatGPT will get some things right, especially tone. But it will miss your avoidance rules and format conventions. And it will exaggerate. It might say you "consistently deploy dry humor as a strategic rhetorical device" when the reality is you're occasionally funny in emails.</p>
+
+    <p>Cut the overstatements. Add what's missing. Save the result as a single document, one section per register. That's your voice guide.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-label">The editing step matters</div>
+      <p>Skipping the edit and feeding ChatGPT's raw analysis back to itself is a common mistake. The analysis is a starting point. Your editing pass is what makes it accurate. You know how you write better than ChatGPT does. The edit is where your actual voice gets into the document.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('categories')">&larr; Step 2: Learn the Categories</button>
+      <button class="panel-nav-btn" onclick="goTo('build')">Step 4: Build the Skill &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- STEP 4: BUILD                           -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-build">
+    <div class="section-number">The Build — Step 4</div>
+    <h2>Build the Skill</h2>
+
+    <h3>Upload your voice guide and prompt</h3>
+
+    <p>Open a new ChatGPT conversation. Attach your voice guide (a .docx file is fine, no need to convert it) and paste this prompt:</p>
+
+    <div class="prompt-block">"I've attached my voice guide. It describes [X] registers. Build me a ChatGPT skill that applies this voice whenever I'm writing as myself. The skill should detect or ask which register to use. ChatGPT must use this skill when [list from Step 1]. It must not activate when [list from Step 1]."</div>
+
+    <h3>Review the draft skill</h3>
+
+    <p>ChatGPT will generate a draft and show you a preview. Read through it. Check that your avoidance rules, pronoun logic, and format conventions survived the translation. Check that the activation and exclusion rules match what you defined in Step 1.</p>
+
+    <div class="callout callout-warning">
+      <div class="callout-label">Read before you install</div>
+      <p>It's tempting to click Install immediately. Don't. The draft skill often drops specific rules, especially avoidance rules and judgment heuristics. A two-minute read-through now saves you from debugging a skill that "mostly works" for the next month.</p>
+    </div>
+
+    <h3>Install and test</h3>
+
+    <p>Click Install, then open a new chat and write something in each register. Your voice skill should activate automatically. If it doesn't, @-mention the skill by name.</p>
+
+    <p>Compare the output to what ChatGPT gives you without the skill. The difference should be obvious. If it's subtle, the skill needs more specifics in your voice guide. Go back to Step 3 and add detail to the categories that feel thin.</p>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('analyze')">&larr; Step 3: Collect &amp; Analyze</button>
+      <button class="panel-nav-btn" onclick="goTo('deeper')">Go Deeper &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- GO DEEPER                               -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-deeper">
+    <div class="section-number">Resources</div>
+    <h2>Go Deeper</h2>
+
+    <p class="lead-text">Guides and walkthroughs on teaching AI to write in your voice.</p>
+
+    <ul class="go-deeper-list">
+      <li>
+        <a href="https://zapier.com/blog/train-chatgpt-to-write-like-you/" target="_blank">How to Train ChatGPT to Write Like You — Zapier</a>
+        <span class="link-desc">Practical walkthrough of voice training using custom instructions and writing samples.</span>
+      </li>
+      <li>
+        <a href="https://www.thecaio.ai/blog/train-ai-on-your-voice" target="_blank">How to Train AI on Your Writing Voice — CAIO</a>
+        <span class="link-desc">Covers voice profiling across ChatGPT and Claude, including Claude's Custom Styles feature.</span>
+      </li>
+      <li>
+        <a href="https://likeone.ai/blog/how-to-train-ai-to-write-like-you/" target="_blank">How to Train AI to Write Like You — Like One</a>
+        <span class="link-desc">Step-by-step voice cloning guide with techniques for style guides and prompt engineering.</span>
+      </li>
+    </ul>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('build')">&larr; Step 4: Build the Skill</button>
+      <button class="panel-nav-btn hidden">Next &rarr;</button>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  const panels = document.querySelectorAll('.panel');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const panelOrder = ['intro', 'where', 'scope', 'categories', 'analyze', 'build', 'deeper'];
+
+  function goTo(id) {
+    panels.forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('panel-' + id);
+    if (target) {
+      target.classList.add('active');
+      target.style.animation = 'none';
+      target.offsetHeight;
+      target.style.animation = '';
+    }
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.panel === id));
+    document.getElementById('mainContent').scrollTop = 0;
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.panel === id);
+    });
+  }
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => goTo(item.dataset.panel));
+  });
+
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileLabels = {
+    intro: 'Start',
+    where: 'Where',
+    scope: 'Step 1',
+    categories: 'Step 2',
+    analyze: 'Step 3',
+    build: 'Step 4',
+    deeper: 'Resources'
+  };
+
+  panelOrder.forEach(id => {
+    const btn = document.createElement('button');
+    btn.className = 'mobile-nav-btn' + (id === panelOrder[0] ? ' active' : '');
+    btn.textContent = mobileLabels[id] || id;
+    btn.dataset.panel = id;
+    btn.addEventListener('click', () => goTo(id));
+    mobileNav.appendChild(btn);
+  });
+</script>
+
+</body>
+</html>

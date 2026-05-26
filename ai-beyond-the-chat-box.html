@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Beyond the Chat Box — How to AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --navy: #162431;
+    --orange: #EF811F;
+    --blue: #114973;
+    --red: #961B28;
+    --purple: #55233D;
+    --taupe: #ACA095;
+    --bg: #F7F6F4;
+    --surface: #FFFFFF;
+    --text-primary: #162431;
+    --text-secondary: #3A4A5A;
+    --text-muted: #6B7A8A;
+    --border: #D9D5CF;
+    --border-light: #E7E6E6;
+    --orange-light: #FEF3E6;
+    --blue-light: #EAF0F7;
+    --purple-light: #F3EBF0;
+    --sidebar-width: 300px;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'DM Sans', Arial, sans-serif;
+    color: var(--text-primary);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Top bar ── */
+  .top-bar { height: 4px; background: var(--orange); flex-shrink: 0; }
+
+  /* ── Layout ── */
+  .layout { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 28px 24px 24px;
+    border-bottom: 2px solid var(--orange);
+  }
+
+  .sidebar-brand {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--taupe);
+    margin-bottom: 6px;
+  }
+
+  .sidebar-title {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.2;
+  }
+
+  .sidebar-title span { color: var(--orange); }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+  .nav-group-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--taupe);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 20px 24px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); }
+
+  .nav-item.active {
+    background: rgba(239, 129, 31, 0.08);
+    border-left-color: var(--orange);
+  }
+
+  .nav-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    width: 24px;
+    text-align: center;
+  }
+
+  .nav-text { flex: 1; }
+
+  .nav-label {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: rgba(255,255,255,0.6);
+    display: block;
+  }
+
+  .nav-item.active .nav-label { color: #FFFFFF; }
+
+  .nav-desc {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.4;
+    margin-top: 3px;
+    display: block;
+  }
+
+  .nav-item.active .nav-desc { color: rgba(255,255,255,0.5); }
+
+  .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 11px;
+    color: var(--taupe);
+    text-align: center;
+  }
+
+  .sidebar-footer a { color: var(--orange); text-decoration: none; }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg);
+    scroll-behavior: smooth;
+  }
+
+  .main::-webkit-scrollbar { width: 6px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+  /* ── Content panel ── */
+  .panel {
+    display: none;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 48px 80px;
+    animation: panelIn 0.3s ease both;
+  }
+
+  .panel.active { display: block; }
+
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Section number ── */
+  .section-number {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* ── Typography ── */
+  .panel h2 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .panel h3 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-top: 40px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .panel p {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.8;
+  }
+
+  .panel strong { color: var(--text-primary); font-weight: 700; }
+  .panel em { font-style: italic; }
+
+  .panel ul, .panel ol {
+    margin-bottom: 20px;
+    padding-left: 24px;
+  }
+
+  .panel li {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    line-height: 1.7;
+  }
+
+  .lead-text {
+    font-size: 19px;
+    line-height: 1.7;
+    color: var(--navy);
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  /* ── Nav arrows ── */
+  .panel-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 2px solid var(--orange);
+  }
+
+  .panel-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .panel-nav-btn:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+
+  .panel-nav-btn.hidden { visibility: hidden; }
+
+  /* ── Callout ── */
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 28px 0;
+    border-left: 4px solid var(--orange);
+    background: var(--orange-light);
+  }
+
+  .callout-label {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .callout p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+    line-height: 1.65;
+  }
+
+  .callout-warning { background: rgba(150, 27, 40, 0.04); border-left-color: var(--red); }
+  .callout-warning .callout-label { color: var(--red); }
+
+  .callout-info { background: var(--blue-light); border-left-color: var(--blue); }
+  .callout-info .callout-label { color: var(--blue); }
+
+  .callout-purple { background: var(--purple-light); border-left-color: var(--purple); }
+  .callout-purple .callout-label { color: var(--purple); }
+
+  .callout-policy {
+    background: var(--navy);
+    border-left-color: var(--orange);
+    border-radius: var(--radius-sm);
+  }
+
+  .callout-policy .callout-label {
+    color: var(--orange);
+  }
+
+  .callout-policy p {
+    color: rgba(255,255,255,0.8);
+  }
+
+  .callout-policy strong {
+    color: #FFFFFF;
+  }
+
+  /* ── Policy nav item ── */
+  .nav-item.nav-policy {
+    border-left-color: transparent;
+  }
+
+  .nav-item.nav-policy .nav-label {
+    color: var(--red);
+  }
+
+  .nav-item.nav-policy.active {
+    background: rgba(150, 27, 40, 0.12);
+    border-left-color: var(--red);
+  }
+
+  .nav-item.nav-policy.active .nav-label {
+    color: #FF6B7A;
+  }
+
+  .nav-item.nav-policy.active .nav-desc {
+    color: rgba(255,107,122,0.5);
+  }
+
+  /* ── Policy panel ── */
+  .policy-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .policy-shield {
+    width: 48px;
+    height: 48px;
+    background: rgba(150, 27, 40, 0.08);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .policy-panel-header h2 {
+    color: var(--red);
+    margin-bottom: 0;
+  }
+
+  .policy-box {
+    background: rgba(150, 27, 40, 0.04);
+    border: 2px solid var(--red);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin: 28px 0;
+  }
+
+  .policy-box p {
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--text-primary);
+  }
+
+  .policy-box strong {
+    color: var(--red);
+  }
+
+  .policy-box .policy-action {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(150, 27, 40, 0.15);
+    font-size: 15px;
+    color: var(--text-secondary);
+  }
+
+  /* ── Example block ── */
+  .example-block {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 24px 0;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 1px 3px rgba(22,36,49,0.04);
+  }
+
+  .example-label {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--blue);
+    margin-bottom: 10px;
+  }
+
+  .example-block p {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+  }
+
+  .example-block ul {
+    margin: 8px 0 0;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .example-block li {
+    font-size: 15px;
+    margin-bottom: 10px;
+    padding-left: 22px;
+    position: relative;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .example-block li::before {
+    content: '\2192';
+    position: absolute;
+    left: 0;
+    color: var(--blue);
+    font-weight: 700;
+  }
+
+  /* ── Comparison ── */
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .comparison-box {
+    padding: 22px 24px;
+    border-radius: var(--radius-sm);
+  }
+
+  .comparison-box.without { background: #EEEDEB; border: 1px solid var(--border); }
+  .comparison-box.with { background: var(--orange-light); border: 1px solid rgba(239,129,31,0.25); }
+
+  .comparison-box h4 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  .comparison-box.without h4 { color: var(--text-muted); }
+  .comparison-box.with h4 { color: var(--orange); }
+
+  .comparison-box .analogy {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+
+  .comparison-box p {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+  }
+
+  /* ── Tool grid ── */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 24px 0;
+  }
+
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 20px 22px;
+    box-shadow: 0 1px 3px rgba(22,36,49,0.04);
+    transition: border-color 0.2s;
+  }
+
+  .tool-card:hover { border-color: var(--orange); }
+
+  .tool-card .tool-emoji { font-size: 24px; margin-bottom: 10px; }
+
+  .tool-card h4 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  .tool-card p {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+  }
+
+  /* ── Framing quote ── */
+  .framing-quote {
+    font-size: 20px;
+    font-style: italic;
+    color: var(--navy);
+    font-weight: 600;
+    padding: 20px 0 20px 24px;
+    border-left: 4px solid var(--orange);
+    margin: 28px 0;
+    line-height: 1.5;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    html, body { overflow: auto; }
+    .layout { flex-direction: column; }
+    .main { overflow: visible; }
+    .panel { padding: 40px 24px 60px; }
+    .panel h2 { font-size: 26px; }
+    .comparison-grid, .tool-grid { grid-template-columns: 1fr; }
+    /* Show mobile nav */
+    .mobile-nav { display: flex; }
+  }
+
+  /* ── Mobile nav ── */
+  .mobile-nav {
+    display: none;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--navy);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-nav-btn {
+    flex-shrink: 0;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    background: none;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    padding: 6px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .mobile-nav-btn.active {
+    background: var(--orange);
+    color: white;
+    border-color: var(--orange);
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<div class="layout">
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">The Persimmon Group</div>
+    <div class="sidebar-title">AI Beyond the <span>Chat Box</span></div>
+  </div>
+  <div class="sidebar-nav" id="sidebarNav">
+
+    <a class="nav-item active" data-panel="intro">
+      <span class="nav-icon">👋</span>
+      <span class="nav-text">
+        <span class="nav-label">Start Here</span>
+        <span class="nav-desc">Why the chat window is just the beginning</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">The first layer</div>
+
+    <a class="nav-item" data-panel="tools">
+      <span class="nav-icon">⚡</span>
+      <span class="nav-text">
+        <span class="nav-label">Tools: How AI Takes Action</span>
+        <span class="nav-desc">The built-in capabilities behind every AI response</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Making AI yours</div>
+
+    <a class="nav-item" data-panel="context">
+      <span class="nav-icon">🧠</span>
+      <span class="nav-text">
+        <span class="nav-label">Context: How AI Gets to Know You</span>
+        <span class="nav-desc">Project spaces, memory, and skills</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Extending AI's reach</div>
+
+    <a class="nav-item" data-panel="plugins">
+      <span class="nav-icon">🔌</span>
+      <span class="nav-text">
+        <span class="nav-label">Plug-ins: AI Inside Your Apps</span>
+        <span class="nav-desc">PowerPoint, Excel, Word, and Outlook</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="connectors">
+      <span class="nav-icon">🔗</span>
+      <span class="nav-text">
+        <span class="nav-label">Connectors: AI Across Your Tools</span>
+        <span class="nav-desc">Bridging platforms like Notion, Teams, and Canva</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="codex">
+      <span class="nav-icon">🏗️</span>
+      <span class="nav-text">
+        <span class="nav-label">Code/Codex: Build Without Technical Expertise</span>
+        <span class="nav-desc">Describe what you need and AI builds it</span>
+      </span>
+    </a>
+
+    <a class="nav-item nav-policy" data-panel="policy1">
+      <span class="nav-icon">🛡️</span>
+      <span class="nav-text">
+        <span class="nav-label">Policy Alert</span>
+        <span class="nav-desc">Approval required for plug-ins, connectors, and code tools</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">AI that acts</div>
+
+    <a class="nav-item" data-panel="agentic">
+      <span class="nav-icon">🤖</span>
+      <span class="nav-text">
+        <span class="nav-label">Agents: AI That Does the Work</span>
+        <span class="nav-desc">From answering questions to completing tasks</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="desktop">
+      <span class="nav-icon">🖥️</span>
+      <span class="nav-text">
+        <span class="nav-label">Computer Use: AI on Your Desktop &amp; Browser</span>
+        <span class="nav-desc">Agents that see your screen and use your tools</span>
+      </span>
+    </a>
+
+    <a class="nav-item nav-policy" data-panel="policy2">
+      <span class="nav-icon">🛡️</span>
+      <span class="nav-text">
+        <span class="nav-label">Policy Alert</span>
+        <span class="nav-desc">Restrictions on agentic AI, computer use, and browser use</span>
+      </span>
+    </a>
+
+  </div>
+  <div class="sidebar-footer"><a href="index.html">&larr; Back to all resources</a></div>
+</nav>
+
+<!-- ── Mobile nav ── -->
+<div class="mobile-nav" id="mobileNav"></div>
+
+<!-- ── Main ── -->
+<main class="main" id="mainContent">
+
+  <!-- ════════════════════════════════════ -->
+  <!-- INTRO                               -->
+  <!-- ════════════════════════════════════ -->
+  <div class="panel active" id="panel-intro">
+    <div class="section-number">AI Explainer</div>
+    <h2>AI Beyond the Chat Box</h2>
+
+    <p class="lead-text">You already know how to talk to AI, and you may even have a favorite. But as AI evolves, the model itself is becoming less important than what's being built on top of it.</p>
+
+    <p>The tools, products, and capabilities emerging around AI are unlocking a world of possibilities&mdash;even for non-technical people. The reasoning engine is a foundation, not the finish line.</p>
+
+    <p>This guide gives you a whirlwind tour of what's happening right now. Each section covers one concept, explains why it matters, and shows you what it looks like in practice. You can read straight through or click around&mdash;they're designed to stand on their own.</p>
+
+    <div class="framing-quote">Think of the AI model as an engine. Everything in this guide is what turns that engine into a vehicle that actually goes somewhere.</div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn hidden">&larr; Previous</button>
+      <button class="panel-nav-btn" onclick="goTo('tools')">Tools: How AI Takes Action &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- TOOLS                               -->
+  <!-- ════════════════════════════════════ -->
+  <div class="panel" id="panel-tools">
+    <div class="section-number">The First Layer</div>
+    <h2>How AI Takes Action</h2>
+
+    <p class="lead-text">At its core, an AI model generates text. Tools are what let it <em>do</em> things.</p>
+
+    <p>When you ask AI to search the web, it's calling a tool. When it reads a PDF you uploaded, that's a tool. When it writes and runs code, generates an image, or creates a file&mdash;all tools. They're the bridge between "AI that talks" and "AI that takes action."</p>
+
+    <p>Most AI platforms ship with a set of built-in tools. You don't configure them&mdash;they're just there, and the AI calls them when it decides it needs to. But tools can also be built by developers and added to a platform, which is how AI gets extended to do things its creators never planned for. (More on that when we get to connectors.)</p>
+
+    <div class="tool-grid">
+      <div class="tool-card">
+        <div class="tool-emoji">🔍</div>
+        <h4>Web Search</h4>
+        <p>Searches the internet for current information instead of relying only on training data.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-emoji">💻</div>
+        <h4>Code Execution</h4>
+        <p>Writes code and runs it&mdash;for analysis, file conversion, calculations, or building things.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-emoji">📄</div>
+        <h4>File Reading</h4>
+        <p>Reads documents, spreadsheets, and PDFs you upload, then works with their contents.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-emoji">🎨</div>
+        <h4>Image Generation</h4>
+        <p>Creates images, diagrams, and visuals from text descriptions.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Key concept</div>
+      <p>Tools are the first layer on top of the model. Without them, AI can only write. With them, it can search, calculate, read, create, and act. Everything else in this guide builds on this foundation.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('intro')">&larr; Start Here</button>
+      <button class="panel-nav-btn" onclick="goTo('context')">Context: How AI Gets to Know You &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- CONTEXT                             -->
+  <!-- ════════════════════════════════════ -->
+  <div class="panel" id="panel-context">
+    <div class="section-number">Making AI Yours</div>
+    <h2>From Stranger to Colleague</h2>
+
+    <p class="lead-text">Tools give AI capabilities. Context gives it <em>judgment</em>&mdash;the knowledge to use those capabilities the way you'd want.</p>
+
+    <div class="comparison-grid">
+      <div class="comparison-box without">
+        <h4>Without context</h4>
+        <div class="analogy">AI is a smart stranger.</div>
+        <p>You say "write me a proposal" and get a generic template. You spend 45 minutes reformatting.</p>
+      </div>
+      <div class="comparison-box with">
+        <h4>With context</h4>
+        <div class="analogy">AI is a colleague who knows how you work.</div>
+        <p>You say "write me a proposal" and it asks the right questions, uses your format, matches your voice.</p>
+      </div>
+    </div>
+
+    <p>This is one of the fastest-evolving areas in AI. Every major platform is building new ways to let you give AI more context. The names differ, but the pattern is the same.</p>
+
+    <h3>Project Spaces</h3>
+    <p>A workspace where you give AI a set of instructions and files that persist across conversations. Instead of re-explaining your preferences every time, the project space holds that context for you. Claude calls them Projects. ChatGPT calls them Projects. Microsoft Copilot calls them Notebooks. The concept is the same: a dedicated home for a topic or workstream where AI already knows the ground rules.</p>
+
+    <h3>Memory</h3>
+    <p>AI that remembers facts and preferences across sessions&mdash;your name, your role, your formatting preferences, the project you're working on&mdash;without you restating them every time you start a new conversation.</p>
+
+    <h3>Skills</h3>
+    <p>A reusable set of instructions that teaches AI how to do a specific task <em>your way</em>&mdash;without re-explaining the details each time. Think of it like training a colleague: you walk them through the process once, and from then on they just do it. Skills range from simple (format a document in our brand template) to sophisticated (stress-test my proposal for logical weaknesses).</p>
+
+    <div class="callout-info callout">
+      <div class="callout-label">Want to go deeper on skills?</div>
+      <p>We have a separate guide covering skill types, how to build them, and how to chain multiple skills together in a single conversation&mdash;where one skill drafts your proposal, another checks it for AI-sounding language, and a third reviews it for persuasion. Three passes, one conversation, no copy-paste.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('tools')">&larr; Tools: How AI Takes Action</button>
+      <button class="panel-nav-btn" onclick="goTo('plugins')">Plug-ins: AI Inside Your Apps &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- PLUG-INS                            -->
+  <!-- ════════════════════════════════════ -->
+  <div class="panel" id="panel-plugins">
+    <div class="section-number">Extending AI's Reach</div>
+    <h2>AI Inside Your Apps</h2>
+
+    <p class="lead-text">Everything so far happens inside a chat window. Plug-ins flip the direction&mdash;they put AI inside the apps you already use.</p>
+
+    <p>Instead of copying content out of PowerPoint, pasting it into a chat, getting AI's response, and pasting it back, plug-ins let AI work directly inside your document. The AI sees what you see and edits where you edit.</p>
+
+    <h3>PowerPoint</h3>
+    <p>This is likely where your team will feel plug-ins first. AI inside PowerPoint can restructure a deck from an outline, restyle slides to match a template, generate speaker notes, turn a wall of text into a visual layout, or create new slides that match the look and feel of existing ones. You stay in PowerPoint the whole time.</p>
+
+    <div class="example-block">
+      <div class="example-label">Try this in PowerPoint</div>
+      <ul>
+        <li>"Turn slide 19 into a slide about plug-ins, matching the style of slide 18."</li>
+        <li>"Add speaker notes to every slide summarizing the key points."</li>
+        <li>"Restructure this 30-slide deck into a tighter 15-slide version."</li>
+        <li>"Create three new slides from this outline, using the design of slide 4."</li>
+      </ul>
+    </div>
+
+    <h3>Excel</h3>
+    <p>AI in Excel can write formulas, build charts, analyze data, create pivot tables, and build financial models from raw data&mdash;all from natural language. You describe what you want; it builds the formula or chart.</p>
+
+    <h3>Word &amp; Outlook</h3>
+    <p>In Word, AI can rewrite sections for tone, tighten verbose drafts, or apply formatting. In Outlook, it can draft replies, summarize long email threads, or pull out action items from a chain of messages.</p>
+
+    <div class="callout-warning callout">
+      <div class="callout-label">Watch out</div>
+      <p>Plug-ins can edit your live document directly. That's what makes them fast&mdash;and why you should review every change before saving. AI is confident, not infallible.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('context')">&larr; Context: How AI Gets to Know You</button>
+      <button class="panel-nav-btn" onclick="goTo('connectors')">Connectors: AI Across Your Tools &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- CONNECTORS                          -->
+  <!-- ════════════════════════════════════ -->
+  <div class="panel" id="panel-connectors">
+    <div class="section-number">Extending AI's Reach</div>
+    <h2>AI Across Your Tools</h2>
+
+    <p class="lead-text">Plug-ins work <em>inside</em> an app. Connectors work <em>between</em> apps.</p>
+
+    <p>Connectors let AI read from and write to other tools from your AI platform. Think of them as bridges: Claude connecting to Notion, ChatGPT reaching into Google Drive, Copilot pulling from Teams. You stay in your AI conversation while it reaches out to the tools where your work actually lives.</p>
+
+    <div class="example-block">
+      <div class="example-label">Examples</div>
+      <ul>
+        <li>"That's a good idea for a newsletter. Add that to my idea database in Notion."</li>
+        <li>"Read all of my voice guidelines in Notion before you draft this."</li>
+        <li>"Send this outline to Canva to create a LinkedIn image."</li>
+        <li>"Pull up last quarter's project notes from Google Drive."</li>
+      </ul>
+    </div>
+
+    <p>Under the hood, connectors are really just <strong>custom tools</strong>&mdash;the same concept from the Tools section, but built by developers to bridge specific platforms. The emerging standard for connecting these tools is called MCP (Model Context Protocol), which is making it easier for any tool to work with any AI platform.</p>
+
+    <div class="callout-warning callout">
+      <div class="callout-label">Important</div>
+      <p>You're still driving each action&mdash;this isn't autonomous. But connectors require careful thought: which ones to enable, what permissions to grant, and what data ends up stored in the third-party tool.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('plugins')">&larr; Plug-ins: AI Inside Your Apps</button>
+      <button class="panel-nav-btn" onclick="goTo('codex')">Code/Codex: Build Without Technical Expertise &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- CODEX / CLAUDE CODE                 -->
+  <!-- ════════════════════════════════════ -->
+  <div class="panel" id="panel-codex">
+    <div class="section-number">Extending AI's Reach</div>
+    <h2>Build Tools Without Code</h2>
+
+    <p class="lead-text">This is the one that surprises people: you can now describe what you want built, and AI writes the code for you.</p>
+
+    <p>Products like Claude Code and OpenAI's Codex let you build tools, automations, and workflows by describing them in plain language. This isn't about becoming a developer. It's about the fact that "I wish I had a tool that does X" is now a solvable problem&mdash;even if you've never written a line of code.</p>
+
+    <div class="example-block">
+      <div class="example-label">What non-coders are building</div>
+      <ul>
+        <li>A dashboard that pulls data from a spreadsheet and visualizes it</li>
+        <li>A custom intake form that routes submissions to the right person</li>
+        <li>An automation that reformats meeting notes into a standard template</li>
+        <li>A small web app that calculates project pricing based on your rate card</li>
+        <li>A script that cleans and merges messy data files from clients</li>
+      </ul>
+    </div>
+
+    <p>The shift is significant: instead of requesting a tool from IT or buying software, you describe what you need and have a working version in minutes. It may not be production-grade, but it's often good enough&mdash;and you can iterate on it conversationally. "Make the chart bigger. Add a column for notes. Export to PDF."</p>
+
+    <div class="callout">
+      <div class="callout-label">Key concept</div>
+      <p>This doesn't replace professional development. But it eliminates the gap between "I need a tool" and "I have a tool"&mdash;especially for internal workflows that would never justify a formal build.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('connectors')">&larr; Connectors: AI Across Your Tools</button>
+      <button class="panel-nav-btn" onclick="goTo('policy1')">Policy Alert &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- AGENTIC AI                          -->
+  <!-- ════════════════════════════════════ -->
+  <div class="panel" id="panel-agentic">
+    <div class="section-number">AI That Acts</div>
+    <h2>AI That Does the Work</h2>
+
+    <p class="lead-text">Everything above makes AI better at responding. This is where AI starts <em>doing</em>.</p>
+
+    <p>"Agentic" means AI takes multiple steps on its own&mdash;reading files, making intermediate decisions, calling tools, producing outputs&mdash;without you approving each step along the way. It's the difference between a tool that answers and an assistant that works.</p>
+
+    <h3>Manually kicked off</h3>
+    <p>You give AI a complex, multi-step task and let it figure out how to get there.</p>
+
+    <div class="example-block">
+      <div class="example-label">Example</div>
+      <p>"Here's my calendar screenshot and my to-do list. Build my plan for the week based on my preferences." AI reads both inputs, cross-references deadlines, identifies conflicts, matches your stated preferences, and produces a structured weekly plan. You gave one instruction; AI took a dozen steps.</p>
+    </div>
+
+    <h3>Scheduled or autonomous</h3>
+    <p>AI runs on a trigger or schedule without you kicking it off. Responsible agents have guardrails&mdash;permission points where a human reviews before anything goes out the door.</p>
+
+    <div class="example-block">
+      <div class="example-label">Example</div>
+      <p>When coaching session notes hit a database, an agent rewrites them into a participant email summary using your template, rules, and voice&mdash;then emails you the draft for review before sending.</p>
+    </div>
+
+    <h3>Sub-agents</h3>
+    <p>As tasks get more complex, agents can delegate to other agents. A "project update" agent might call a "data analysis" sub-agent to crunch numbers, then pass the results to a "report formatting" sub-agent. You see the final output; the coordination happened behind the scenes.</p>
+
+    <h3>The blurring line</h3>
+    <p>Here's what's worth noticing: even ordinary chat conversations are becoming agentic. When you ask Claude a question and it decides to search the web, read a file, and run some code before responding&mdash;that's agentic behavior. The AI chose which tools to use, in what order, without you specifying. The line between "chat" and "agent" is blurring by design.</p>
+
+    <div class="callout-purple callout">
+      <div class="callout-label">A note on "agents" in the wild</div>
+      <p>You'll hear the word "agent" used loosely&mdash;especially from clients using Microsoft Copilot or ChatGPT. When a knowledge worker says they're "building agents," they're most likely creating customized AI assistants with specific instructions and knowledge&mdash;using Copilot's Agent Builder or ChatGPT's Custom GPTs. These are closer to what we'd call a <strong>skill with a persona</strong>: powerful, but not the fully autonomous, multi-step agents described above. The word is the same; the sophistication varies widely. If a client mentions agents, it's worth asking what they mean.</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Key concept</div>
+      <p>If the earlier sections are attachments that make the vacuum more useful, agentic AI redesigns the vacuum entirely. Everything before this point helps AI respond better. This is where AI starts doing the work.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('policy1')">&larr; Policy Alert</button>
+      <button class="panel-nav-btn" onclick="goTo('desktop')">Computer Use: AI on Your Desktop &amp; Browser &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- COMPUTER & BROWSER USE              -->
+  <!-- ════════════════════════════════════ -->
+  <div class="panel" id="panel-desktop">
+    <div class="section-number">AI That Acts</div>
+    <h2>AI on Your Desktop &amp; Browser</h2>
+
+    <p class="lead-text">The most advanced expression of agentic AI: an agent that can see your screen and use your tools.</p>
+
+    <h3>Computer use</h3>
+    <p>AI can now operate your computer&mdash;open applications, navigate interfaces, create files, and work across tools, even ones with no AI integration. Claude's version is called Cowork: a desktop agent that sees your screen, works with your files, and operates your applications the way you would.</p>
+
+    <div class="example-block">
+      <div class="example-label">Example</div>
+      <p>"Take this content and create a formatted Word document using our template, then save it to my desktop." The agent opens Word, applies the template, formats the content, and saves&mdash;without you touching the application.</p>
+    </div>
+
+    <div class="callout-info callout">
+      <div class="callout-label">How this differs from connectors</div>
+      <p>Connectors link to specific platforms through a built integration (Claude &rarr; Notion). Computer use works with <em>anything on your screen</em>&mdash;including tools that have no AI integration at all. It's the universal fallback.</p>
+    </div>
+
+    <h3>Browser use</h3>
+    <p>Same idea, applied to the web. AI navigates websites on your behalf&mdash;researching, filling forms, comparing options, extracting information. Instead of you doing the browsing, AI does the legwork.</p>
+
+    <div class="example-block">
+      <div class="example-label">Example</div>
+      <p>"Take these receipts and enter them into our expense system." The AI navigates the expense portal, clicks "new entry," fills fields, uploads files&mdash;the same steps you'd take, just faster.</p>
+    </div>
+
+    <div class="callout-warning callout">
+      <div class="callout-label">Current limitation</div>
+      <p>Both computer use and browser use are in beta or early release. Capabilities are expanding fast, but proceed carefully&mdash;these tools can see anything on your screen or in your browser, including sensitive data and company assets.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('agentic')">&larr; Agents: AI That Does the Work</button>
+      <button class="panel-nav-btn" onclick="goTo('policy2')">Policy Alert &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- POLICY ALERT 1                      -->
+  <!-- ════════════════════════════════════ -->
+  <div class="panel" id="panel-policy1">
+    <div class="policy-panel-header">
+      <div class="policy-shield">🛡️</div>
+      <h2>Policy Alert</h2>
+    </div>
+
+    <p class="lead-text">Plug-ins, connectors, and code/codex tools extend AI's reach into our systems and data. That reach requires oversight.</p>
+
+    <div class="policy-box">
+      <p>Persimmon <strong>does not allow installing plug-ins, browser extensions, connectors, or code/codex tools without prior approval</strong>. This includes AI integrations inside apps like PowerPoint and Excel, connections between AI platforms and tools like Notion or Teams, and any code-generating tools like Claude Code or Codex.</p>
+      <p>Approval includes a security review to ensure our data and systems remain protected.</p>
+      <div class="policy-action">
+        <strong>If you're interested in using any of these tools, talk to Dianne or a member of the ELT before getting started.</strong> We want to enable these capabilities where they make sense&mdash;we just need to do it safely.
+      </div>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('codex')">&larr; Code/Codex: Build Without Technical Expertise</button>
+      <button class="panel-nav-btn" onclick="goTo('agentic')">Agents: AI That Does the Work &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- POLICY ALERT 2                      -->
+  <!-- ════════════════════════════════════ -->
+  <div class="panel" id="panel-policy2">
+    <div class="policy-panel-header">
+      <div class="policy-shield">🛡️</div>
+      <h2>Policy Alert</h2>
+    </div>
+
+    <p class="lead-text">Agentic AI, computer use, and browser use are powerful&mdash;but they introduce a different level of risk when connected to Persimmon systems.</p>
+
+    <div class="policy-box">
+      <p>These tools can see your screen, access your browser, and take actions across applications&mdash;including applications that contain company data, client information, and sensitive assets. By default, <strong>Persimmon does not allow agentic AI, computer use, or browser use tools</strong>.</p>
+      <p>Persimmon may grant exceptions with appropriate guardrails, based on your role and the specific use case.</p>
+      <div class="policy-action">
+        <strong>Talk to Dianne or a member of the ELT before experimenting with any of these tools on company systems or data.</strong> We're actively evaluating where these capabilities can be used responsibly.
+      </div>
+    </div>
+
+    <p style="margin-top: 40px; font-size: 17px; color: var(--navy); font-weight: 500;">That's the landscape. You don't need all of this at once&mdash;most people start with better prompting, a project space, and a skill or two, then expand from there. But knowing what exists makes it easier to spot opportunities when they show up.</p>
+
+    <p>Questions? Reach out to your team lead or the ELT.</p>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('desktop')">&larr; Computer Use: AI on Your Desktop &amp; Browser</button>
+      <button class="panel-nav-btn hidden">Next &rarr;</button>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  const panels = document.querySelectorAll('.panel');
+  const navItems = document.querySelectorAll('.nav-item');
+  const panelOrder = ['intro','tools','context','plugins','connectors','codex','policy1','agentic','desktop','policy2'];
+
+  function goTo(id) {
+    // Swap panel
+    panels.forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('panel-' + id);
+    if (target) {
+      target.classList.add('active');
+      // Re-trigger animation
+      target.style.animation = 'none';
+      target.offsetHeight;
+      target.style.animation = '';
+    }
+
+    // Update sidebar
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.panel === id));
+
+    // Scroll main to top
+    document.getElementById('mainContent').scrollTop = 0;
+
+    // Update mobile nav
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.panel === id);
+    });
+  }
+
+  // Sidebar click
+  navItems.forEach(item => {
+    item.addEventListener('click', () => goTo(item.dataset.panel));
+  });
+
+  // Build mobile nav
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileLabels = {
+    intro: 'Start',
+    tools: 'Tools',
+    context: 'Context',
+    plugins: 'Plug-ins',
+    connectors: 'Connectors',
+    codex: 'Build',
+    policy1: '⚠️ Policy',
+    agentic: 'Agents',
+    desktop: 'Desktop',
+    policy2: '⚠️ Policy'
+  };
+  panelOrder.forEach(id => {
+    const btn = document.createElement('button');
+    btn.className = 'mobile-nav-btn' + (id === 'intro' ? ' active' : '');
+    btn.textContent = mobileLabels[id];
+    btn.dataset.panel = id;
+    btn.addEventListener('click', () => goTo(id));
+    mobileNav.appendChild(btn);
+  });
+</script>
+
+</body>
+</html>

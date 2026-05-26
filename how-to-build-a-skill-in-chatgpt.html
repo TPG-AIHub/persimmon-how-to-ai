@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Build a Skill in ChatGPT — How to AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --navy: #162431;
+    --orange: #EF811F;
+    --blue: #114973;
+    --red: #961B28;
+    --purple: #55233D;
+    --taupe: #ACA095;
+    --bg: #F7F6F4;
+    --surface: #FFFFFF;
+    --text-primary: #162431;
+    --text-secondary: #3A4A5A;
+    --text-muted: #6B7A8A;
+    --border: #D9D5CF;
+    --border-light: #E7E6E6;
+    --orange-light: #FEF3E6;
+    --blue-light: #EAF0F7;
+    --purple-light: #F3EBF0;
+    --sidebar-width: 300px;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'DM Sans', Arial, sans-serif;
+    color: var(--text-primary);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top-bar { height: 4px; background: var(--orange); flex-shrink: 0; }
+  .layout { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 28px 24px 24px;
+    border-bottom: 2px solid var(--orange);
+  }
+
+  .sidebar-brand {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--taupe);
+    margin-bottom: 6px;
+  }
+
+  .sidebar-title {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.2;
+  }
+
+  .sidebar-title span { color: var(--orange); }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+  .nav-group-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--taupe);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 20px 24px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); }
+
+  .nav-item.active {
+    background: rgba(239, 129, 31, 0.08);
+    border-left-color: var(--orange);
+  }
+
+  .nav-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    width: 24px;
+    text-align: center;
+  }
+
+  .nav-text { flex: 1; }
+
+  .nav-label {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: rgba(255,255,255,0.6);
+    display: block;
+  }
+
+  .nav-item.active .nav-label { color: #FFFFFF; }
+
+  .nav-desc {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.4;
+    margin-top: 3px;
+    display: block;
+  }
+
+  .nav-item.active .nav-desc { color: rgba(255,255,255,0.5); }
+
+  .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 11px;
+    color: var(--taupe);
+    text-align: center;
+  }
+
+  .sidebar-footer a { color: var(--orange); text-decoration: none; }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg);
+    scroll-behavior: smooth;
+  }
+
+  .main::-webkit-scrollbar { width: 6px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+  .panel {
+    display: none;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 48px 80px;
+    animation: panelIn 0.3s ease both;
+  }
+
+  .panel.active { display: block; }
+
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-number {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* ── Typography ── */
+  .panel h2 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .panel h3 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-top: 40px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .panel p {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.8;
+  }
+
+  .panel strong { color: var(--text-primary); font-weight: 700; }
+  .panel em { font-style: italic; }
+
+  .panel ul, .panel ol {
+    margin-bottom: 20px;
+    padding-left: 24px;
+  }
+
+  .panel li {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    line-height: 1.7;
+  }
+
+  .lead-text {
+    font-size: 19px;
+    line-height: 1.7;
+    color: var(--navy);
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  /* ── Panel nav ── */
+  .panel-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 2px solid var(--orange);
+  }
+
+  .panel-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .panel-nav-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .panel-nav-btn.hidden { visibility: hidden; }
+
+  /* ── Callout ── */
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 28px 0;
+    border-left: 4px solid var(--orange);
+    background: var(--orange-light);
+  }
+
+  .callout-label {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .callout p { font-size: 15px; color: var(--text-secondary); margin-bottom: 0; line-height: 1.65; }
+
+  .callout-warning { background: rgba(150, 27, 40, 0.04); border-left-color: var(--red); }
+  .callout-warning .callout-label { color: var(--red); }
+  .callout-info { background: var(--blue-light); border-left-color: var(--blue); }
+  .callout-info .callout-label { color: var(--blue); }
+
+  /* ── Example block ── */
+  .example-block {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 24px 0;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 1px 3px rgba(22,36,49,0.04);
+  }
+  .example-label { font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); margin-bottom: 10px; }
+  .example-block p { font-size: 15px; line-height: 1.65; color: var(--text-secondary); margin-bottom: 0; }
+  .example-block ul { margin: 8px 0 0; padding-left: 0; list-style: none; }
+  .example-block li { font-size: 15px; margin-bottom: 10px; padding-left: 22px; position: relative; line-height: 1.6; color: var(--text-secondary); }
+  .example-block li::before { content: '\2192'; position: absolute; left: 0; color: var(--blue); font-weight: 700; }
+
+  /* ── Numbered steps ── */
+  .steps { counter-reset: step; list-style: none; padding-left: 0; margin: 24px 0; }
+  .steps li { counter-increment: step; position: relative; padding-left: 52px; margin-bottom: 28px; }
+  .steps li::before { content: counter(step); position: absolute; left: 0; top: 2px; width: 36px; height: 36px; background: var(--navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 14px; font-weight: 700; }
+  .steps li strong { display: block; font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 16px; color: var(--navy); margin-bottom: 4px; }
+
+  /* ── Skill anatomy blocks ── */
+  .skill-part {
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    margin: 20px 0;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(22,36,49,0.04);
+  }
+
+  .skill-part-header {
+    background: var(--navy);
+    padding: 12px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .skill-part-header h4 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #FFFFFF;
+    margin: 0;
+  }
+
+  .skill-part-header .part-number {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .skill-part-content {
+    padding: 20px 22px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+
+  .skill-part-content p {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+
+  .skill-part-content p:last-child { margin-bottom: 0; }
+
+  .skill-part-content ul {
+    margin: 8px 0 0;
+    padding-left: 20px;
+  }
+
+  .skill-part-content li {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .skill-part-annotation {
+    padding: 14px 22px;
+    background: var(--bg);
+    border-top: 1px solid var(--border-light);
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ── Related link ── */
+  .related-link {
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s;
+    margin-top: 28px;
+  }
+
+  .related-link:hover {
+    border-left-color: var(--orange);
+    transform: translateY(-2px);
+    box-shadow: 0 1px 3px rgba(22,36,49,0.06);
+  }
+
+  .related-link h4 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .related-link p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    html, body { overflow: auto; }
+    .layout { flex-direction: column; }
+    .main { overflow: visible; }
+    .panel { padding: 40px 24px 60px; }
+    .panel h2 { font-size: 26px; }
+    .mobile-nav { display: flex; }
+  }
+
+  .mobile-nav {
+    display: none;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--navy);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-nav-btn {
+    flex-shrink: 0;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    background: none;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    padding: 6px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .mobile-nav-btn.active { background: var(--orange); color: white; border-color: var(--orange); }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<div class="layout">
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">The Persimmon Group</div>
+    <div class="sidebar-title">Build a <span>Skill</span></div>
+  </div>
+  <div class="sidebar-nav" id="sidebarNav">
+
+    <div class="nav-group-label">Understand the structure</div>
+
+    <a class="nav-item active" data-panel="anatomy">
+      <span class="nav-icon">🧩</span>
+      <span class="nav-text">
+        <span class="nav-label">The Three Parts of a Skill</span>
+        <span class="nav-desc">Name, description, and instructions</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="example">
+      <span class="nav-icon">📄</span>
+      <span class="nav-text">
+        <span class="nav-label">A Complete Working Skill</span>
+        <span class="nav-desc">The Article Summarizer, fully annotated</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Build your own</div>
+
+    <a class="nav-item" data-panel="skill-builder">
+      <span class="nav-icon">🤖</span>
+      <span class="nav-text">
+        <span class="nav-label">Use the Skill Builder</span>
+        <span class="nav-desc">Let ChatGPT guide you through it</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="from-scratch">
+      <span class="nav-icon">✍️</span>
+      <span class="nav-text">
+        <span class="nav-label">Build from Scratch</span>
+        <span class="nav-desc">Write your own in the skill editor</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="from-chat">
+      <span class="nav-icon">💬</span>
+      <span class="nav-text">
+        <span class="nav-label">Build from a Live Chat</span>
+        <span class="nav-desc">Turn a conversation into a reusable skill</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Keep it working</div>
+
+    <a class="nav-item" data-panel="best-practices">
+      <span class="nav-icon">✅</span>
+      <span class="nav-text">
+        <span class="nav-label">Best Practices</span>
+        <span class="nav-desc">What works and what breaks</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="updating">
+      <span class="nav-icon">🔧</span>
+      <span class="nav-text">
+        <span class="nav-label">Updating &amp; Shared Skills</span>
+        <span class="nav-desc">When to edit, and how shared skills work</span>
+      </span>
+    </a>
+
+  </div>
+  <div class="sidebar-footer"><a href="index.html">&larr; Back to all resources</a></div>
+</nav>
+
+<!-- ── Mobile nav ── -->
+<div class="mobile-nav" id="mobileNav"></div>
+
+<!-- ── Main ── -->
+<main class="main" id="mainContent">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- ANATOMY                                 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel active" id="panel-anatomy">
+    <div class="section-number">AI Tutorial</div>
+    <h2>The Three Parts of Every Skill</h2>
+    <p class="lead-text">Every skill is a document with three parts. Understanding what each part does — and why — is the difference between a skill that works reliably and one that fires at the wrong time or produces inconsistent output.</p>
+
+    <div class="skill-part">
+      <div class="skill-part-header">
+        <h4>Name</h4>
+        <span class="part-number">Part 1 of 3</span>
+      </div>
+      <div class="skill-part-content">
+        A short, recognizable label — like "Proposal Builder" or "article-summarizer."
+      </div>
+      <div class="skill-part-annotation">How the skill is identified in your workspace and in conversations. Keep it short and specific. "Proposal Builder" is better than "Proposal Thing" or "Writing Helper."</div>
+    </div>
+
+    <div class="skill-part">
+      <div class="skill-part-header">
+        <h4>Description</h4>
+        <span class="part-number">Part 2 of 3</span>
+      </div>
+      <div class="skill-part-content">
+        A plain-language summary of what the skill does and when to use it.
+      </div>
+      <div class="skill-part-annotation">This is what ChatGPT reads to decide whether the skill applies to a given request. The description controls <em>whether</em> the skill activates — so clarity here directly affects reliability.</div>
+    </div>
+
+    <div class="skill-part">
+      <div class="skill-part-header">
+        <h4>Instructions</h4>
+        <span class="part-number">Part 3 of 3</span>
+      </div>
+      <div class="skill-part-content">
+        The step-by-step process ChatGPT follows once the skill fires.
+      </div>
+      <div class="skill-part-annotation">This is the actual logic — what to ask, how to format output, what rules to follow. The clearer and more specific the instructions, the more consistent the output.</div>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Key distinction</div>
+      <p>The description controls <strong>whether</strong> the skill activates. The instructions control <strong>what it does</strong> once active. Both need to be clear on scope — and you'll often repeat some language across them on purpose.</p>
+    </div>
+
+    <p>You can also package reference files into a skill — a template you always want it to follow, or examples of what good looks like. The trade-off: if your template changes, you need to go back and update the skill. It's simple, but you have to remember to do it.</p>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn hidden">&larr; Previous</button>
+      <button class="panel-nav-btn" onclick="goTo('example')">A Complete Working Skill &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- COMPLETE EXAMPLE                        -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-example">
+    <div class="section-number">Understand the Structure</div>
+    <h2>A Complete Working Skill</h2>
+    <p class="lead-text">Here's a complete, working skill. It's intentionally simple — one job, no integrations — so you can see the three parts clearly.</p>
+
+    <h3>The Name</h3>
+
+    <div class="skill-part">
+      <div class="skill-part-header">
+        <h4>article-summarizer</h4>
+      </div>
+      <div class="skill-part-annotation">A short, hyphenated label that describes what the skill does, not what it's about. "article-summarizer" tells ChatGPT exactly the job this skill performs.</div>
+    </div>
+
+    <h3>The Description</h3>
+
+    <div class="skill-part">
+      <div class="skill-part-header">
+        <h4>Description</h4>
+      </div>
+      <div class="skill-part-content">
+        Summarize a pasted or uploaded article into a structured brief. Always use when the user says "summarize this," "give me the takeaways," "what does this article say," "break this down for me," or pastes/uploads an article and asks for a summary. Accepts pasted text, .txt, .md, .pdf, or .docx files. Produces a markdown summary in chat. Do NOT use for book-length content, meeting notes, or transcripts — only articles and blog posts.
+      </div>
+      <div class="skill-part-annotation">Notice three things: a plain-language statement of what it does, a list of real trigger phrases someone would actually say, and explicit boundaries on what it doesn't do. The imperative language ("Always use when…," "Do NOT use for…") is what pushes trigger reliability above 90%.</div>
+    </div>
+
+    <h3>The Instructions</h3>
+
+    <div class="skill-part">
+      <div class="skill-part-header">
+        <h4>Instructions</h4>
+      </div>
+      <div class="skill-part-content">
+        <p><strong>Purpose:</strong> Turn an article into a structured brief that captures the argument, the evidence, and the so-what — not just the topic.</p>
+        <p><strong>Accepted inputs:</strong> Pasted text, .txt, .md, .pdf, or .docx. If a file is uploaded, read it before proceeding. If the content is under 200 words, tell the user it's too short to summarize meaningfully and ask if they have the full article.</p>
+        <p><strong>Output format</strong> — produce a markdown summary with these sections, in this order:</p>
+        <ul>
+          <li><strong>Title:</strong> The article's title, or "Untitled" if none is apparent.</li>
+          <li><strong>Source:</strong> Author and/or publication, if identifiable. "Unknown" if not.</li>
+          <li><strong>Point of View:</strong> What is the author's overall point of view, and how is it different from other common takes? Skip for purely informational articles.</li>
+          <li><strong>Main arguments:</strong> 1–3 sentences per key point. What the author is actually claiming — not the topic, the claim. Based on what evidence?</li>
+          <li><strong>So what:</strong> Why should this matter to me in my role?</li>
+        </ul>
+        <p><strong>What to avoid:</strong> Do not editorialize. Do not quote long passages — paraphrase, and quote only when exact wording matters. Do not pad sections: if the article presents no real evidence, write "None cited — argument is assertion-based." Do not add a closing line like "Let me know if you'd like more detail." Just end after the last section.</p>
+      </div>
+      <div class="skill-part-annotation">Written in imperative voice — direct commands, not suggestions. Notice the structure: purpose, inputs, output format (with exact sections in exact order), and explicit guardrails on what to avoid.</div>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('anatomy')">&larr; Three Parts of a Skill</button>
+      <button class="panel-nav-btn" onclick="goTo('skill-builder')">Use the Skill Builder &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SKILL BUILDER                           -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-skill-builder">
+    <div class="section-number">Build Your Own</div>
+    <h2>Option 1: Use the Skill Builder</h2>
+    <p class="lead-text">ChatGPT has a built-in Skill Builder that guides you through the process conversationally. It asks you questions and drafts the skill for you.</p>
+
+    <ol class="steps">
+      <li>
+        <strong>Open the Skill Builder</strong>
+        Go to Settings → Personalization → Skills → Create a Skill → "Use Skill Builder."
+      </li>
+      <li>
+        <strong>Describe your task in plain language</strong>
+        Example: "I want a skill that takes my raw client meeting notes and turns them into a structured summary with action items."
+      </li>
+      <li>
+        <strong>Answer the follow-up questions</strong>
+        The Skill Builder will ask about format, priorities, and rules. Answer naturally — you don't need special terminology.
+      </li>
+      <li>
+        <strong>Review the draft</strong>
+        The Skill Builder drafts the Name, Description, and Instructions. Read them carefully, make any edits, and save.
+      </li>
+      <li>
+        <strong>Test it several ways</strong>
+        Try different inputs and different phrasings of your request. A skill isn't done until it handles variation well.
+      </li>
+    </ol>
+
+    <div class="callout">
+      <div class="callout-label">Pro tip</div>
+      <p>Ask the Skill Builder to help you think through edge cases or exceptions. It's good at surfacing scenarios you might not have considered. For complex skills, expect to refine and redraft a few times as you use it.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('example')">&larr; Complete Working Skill</button>
+      <button class="panel-nav-btn" onclick="goTo('from-scratch')">Build from Scratch &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- FROM SCRATCH                            -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-from-scratch">
+    <div class="section-number">Build Your Own</div>
+    <h2>Option 2: Build from Scratch</h2>
+    <p class="lead-text">Building a skill from scratch takes about 10–15 minutes after you've done it once. Here's the full process:</p>
+
+    <ol class="steps">
+      <li>
+        <strong>Open ChatGPT</strong>
+        Click the Business profile icon (bottom left) → Skills.
+      </li>
+      <li>
+        <strong>Click "Skill"</strong>
+        This opens the skill editor. You'll see existing skills listed; click to create a new one.
+      </li>
+      <li>
+        <strong>Write a clear name</strong>
+        Keep it short and specific. Describe the job, not the topic.
+      </li>
+      <li>
+        <strong>Write the description</strong>
+        2–4 sentences. Explain what the skill does and the situations it applies to. Include imperative triggers: "Always use when…" and "Do NOT use when…"
+      </li>
+      <li>
+        <strong>Write the instructions</strong>
+        Step-by-step. What should ChatGPT do first? What questions should it ask? What format should the output take? Be explicit.
+      </li>
+      <li>
+        <strong>Save and test</strong>
+        Save the skill, open a new conversation, and try a request that should trigger it. Then try a request that should <em>not</em> trigger it.
+      </li>
+      <li>
+        <strong>Refine as needed</strong>
+        Most skills need a tweak or two after the first test. Edit the description or instructions and test again.
+      </li>
+    </ol>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('skill-builder')">&larr; Use the Skill Builder</button>
+      <button class="panel-nav-btn" onclick="goTo('from-chat')">Build from a Live Chat &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- FROM CHAT                               -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-from-chat">
+    <div class="section-number">Build Your Own</div>
+    <h2>Option 3: Build from a Live Chat</h2>
+    <p class="lead-text">You don't have to stop what you're doing to build a skill. Some of the most useful skills get created mid-conversation — when you notice you're doing something you'll want to repeat.</p>
+
+    <p>Say you're deep in a chat — drafting a client recap, working through a piece of analysis — and you realize, "I'm going to want to do this exact thing again next week." You don't have to switch to the skills editor. Just tell ChatGPT, in that same conversation, that you want to turn what you just did into a skill.</p>
+
+    <div class="example-block">
+      <div class="example-label">Try saying</div>
+      <p>"Build a skill from what we just did — I want to be able to trigger this again later."</p>
+    </div>
+
+    <p>ChatGPT activates the skill-builder right there in the chat. It walks you through the same questions the standalone Skill Builder would ask, drafts the Name, Description, and Instructions based on the conversation you just had, and saves the skill when you're done. You keep your context, and you walk away with a reusable capability.</p>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('from-scratch')">&larr; Build from Scratch</button>
+      <button class="panel-nav-btn" onclick="goTo('best-practices')">Best Practices &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- BEST PRACTICES                          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-best-practices">
+    <div class="section-number">Keep It Working</div>
+    <h2>Best Practices</h2>
+    <p class="lead-text">Skills are easy to build. The harder part is building them well. These practices come from real experience with what works and what breaks.</p>
+
+    <ul>
+      <li><strong>Write descriptions that state when the skill applies — not just what it does.</strong> Include specific trigger phrases someone would actually say, and clear imperative rules about when ChatGPT must and must not use the skill.</li>
+      <li><strong>Test in multiple scenarios before calling a skill done.</strong> Try phrasing your request several different ways. Try inputs that are close to the skill's job but not quite right — it should not fire for those.</li>
+      <li><strong>Start with tasks you do repeatedly and already understand well.</strong> If you can describe the process clearly to a new colleague, you can turn it into a skill.</li>
+      <li><strong>Keep each skill focused on one job.</strong> Narrow skills with clear triggers are more reliable than broad skills. One skill to build a course description, one to build a class outline, one to design exercises — not one skill that does all three.</li>
+      <li><strong>Update skills when your process changes.</strong> A skill is only as good as its instructions. If the template changes, the skill needs to change too.</li>
+      <li><strong>Name your skills consistently</strong> so the team can understand what they do at a glance.</li>
+    </ul>
+
+    <div class="callout callout-warning">
+      <div class="callout-label">Watch out</div>
+      <p>Don't build more than 20–30 skills (until the technology gets better). Too many can confuse ChatGPT about when to use what. Imperative directions help significantly, but you may see lower performance as you go past 30.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('from-chat')">&larr; Build from a Live Chat</button>
+      <button class="panel-nav-btn" onclick="goTo('updating')">Updating &amp; Shared Skills &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- UPDATING & SHARED SKILLS                -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-updating">
+    <div class="section-number">Keep It Working</div>
+    <h2>Updating &amp; Shared Skills</h2>
+
+    <h3>When to update a skill</h3>
+
+    <p>Skills need updating when your process changes, when you learn something new, or when the skill isn't performing the way you want. Here are the signs:</p>
+
+    <ul>
+      <li><strong>The skill fires at the wrong time</strong> (or doesn't fire when it should) — update the description or triggers.</li>
+      <li><strong>The output is consistently off in the same way</strong> — update the instructions.</li>
+      <li><strong>Your underlying process changed</strong> (new proposal format, new template) — update the instructions.</li>
+      <li><strong>You've identified patterns the skill should catch but doesn't</strong> — add them to the instructions.</li>
+    </ul>
+
+    <h3>How to edit a skill</h3>
+
+    <p>The easiest way: just tell ChatGPT you want to edit the skill. Always ask it to repackage the skill <strong>as a zip file</strong> that you can upload. The system will prompt you to confirm you want to replace the old version. Say yes.</p>
+
+    <div class="callout callout-warning">
+      <div class="callout-label">Important: always request a zip file</div>
+      <p>If your skill includes reference files (like a template), they need to be bundled into the package. If you just ask ChatGPT to "update the skill," it may only give you the .md file (the instructions) and you'll accidentally replace a version that included your template with one that doesn't.</p>
+    </div>
+
+    <h3>Shared skills on the team workspace</h3>
+
+    <p>If you publish a skill to the Persimmon shared workspace that handles something multiple people do (like building exercises or formatting documents), keep these things in mind:</p>
+
+    <ul>
+      <li><strong>Get agreement first.</strong> Make sure the team agrees this is the shared version that works for most people most of the time.</li>
+      <li><strong>You can always have your own version.</strong> A personal skill tailored to your preferences can coexist with a shared team skill. Your personal version takes priority in your conversations.</li>
+      <li><strong>You're responsible for keeping it current.</strong> If a template, process, or standard changes, the shared skill needs to reflect that — otherwise teammates are working from outdated instructions.</li>
+    </ul>
+
+    <a class="related-link" href="skills-what-they-are-and-when-they-matter.html">
+      <h4>← Skills: What They Are and When They Matter</h4>
+      <p>What skills are, how they compare to Custom GPTs and Projects, and why they're worth learning.</p>
+    </a>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('best-practices')">&larr; Best Practices</button>
+      <button class="panel-nav-btn hidden">Next &rarr;</button>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  const panels = document.querySelectorAll('.panel');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const panelOrder = ['anatomy', 'example', 'skill-builder', 'from-scratch', 'from-chat', 'best-practices', 'updating'];
+
+  function goTo(id) {
+    panels.forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('panel-' + id);
+    if (target) {
+      target.classList.add('active');
+      target.style.animation = 'none';
+      target.offsetHeight;
+      target.style.animation = '';
+    }
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.panel === id));
+    document.getElementById('mainContent').scrollTop = 0;
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.panel === id);
+    });
+  }
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => goTo(item.dataset.panel));
+  });
+
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileLabels = {
+    anatomy: 'Three Parts',
+    example: 'Full Example',
+    'skill-builder': 'Skill Builder',
+    'from-scratch': 'From Scratch',
+    'from-chat': 'From Chat',
+    'best-practices': 'Best Practices',
+    updating: 'Updating'
+  };
+
+  panelOrder.forEach(id => {
+    const btn = document.createElement('button');
+    btn.className = 'mobile-nav-btn' + (id === panelOrder[0] ? ' active' : '');
+    btn.textContent = mobileLabels[id] || id;
+    btn.dataset.panel = id;
+    btn.addEventListener('click', () => goTo(id));
+    mobileNav.appendChild(btn);
+  });
+</script>
+
+</body>
+</html>

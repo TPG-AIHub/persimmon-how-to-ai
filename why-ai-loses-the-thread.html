@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why Long Chats Make ChatGPT Dumber (And How to Fix It) — How to AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --navy: #162431;
+    --orange: #EF811F;
+    --blue: #114973;
+    --red: #961B28;
+    --purple: #55233D;
+    --taupe: #ACA095;
+    --bg: #F7F6F4;
+    --surface: #FFFFFF;
+    --text-primary: #162431;
+    --text-secondary: #3A4A5A;
+    --text-muted: #6B7A8A;
+    --border: #D9D5CF;
+    --border-light: #E7E6E6;
+    --orange-light: #FEF3E6;
+    --blue-light: #EAF0F7;
+    --purple-light: #F3EBF0;
+    --sidebar-width: 300px;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'DM Sans', Arial, sans-serif;
+    color: var(--text-primary);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top-bar { height: 4px; background: var(--orange); flex-shrink: 0; }
+  .layout { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 28px 24px 24px;
+    border-bottom: 2px solid var(--orange);
+  }
+
+  .sidebar-brand {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--taupe);
+    margin-bottom: 6px;
+  }
+
+  .sidebar-title {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.2;
+  }
+
+  .sidebar-title span { color: var(--orange); }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+  .nav-group-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--taupe);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 20px 24px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); }
+
+  .nav-item.active {
+    background: rgba(239, 129, 31, 0.08);
+    border-left-color: var(--orange);
+  }
+
+  .nav-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    width: 24px;
+    text-align: center;
+  }
+
+  .nav-text { flex: 1; }
+
+  .nav-label {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: rgba(255,255,255,0.6);
+    display: block;
+  }
+
+  .nav-item.active .nav-label { color: #FFFFFF; }
+
+  .nav-desc {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.4;
+    margin-top: 3px;
+    display: block;
+  }
+
+  .nav-item.active .nav-desc { color: rgba(255,255,255,0.5); }
+
+  .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 11px;
+    color: var(--taupe);
+    text-align: center;
+  }
+
+  .sidebar-footer a { color: var(--orange); text-decoration: none; }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg);
+    scroll-behavior: smooth;
+  }
+
+  .main::-webkit-scrollbar { width: 6px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+  .panel {
+    display: none;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 48px 80px;
+    animation: panelIn 0.3s ease both;
+  }
+
+  .panel.active { display: block; }
+
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-number {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .panel h2 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .panel h3 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-top: 40px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .panel h3:first-of-type { margin-top: 28px; }
+
+  .panel p {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.8;
+  }
+
+  .panel strong { color: var(--text-primary); font-weight: 700; }
+  .panel em { font-style: italic; }
+
+  .panel ul, .panel ol {
+    margin-bottom: 20px;
+    padding-left: 24px;
+  }
+
+  .panel li {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    line-height: 1.7;
+  }
+
+  .lead-text {
+    font-size: 19px;
+    line-height: 1.7;
+    color: var(--navy);
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  .framing-quote {
+    font-size: 20px;
+    font-style: italic;
+    color: var(--navy);
+    font-weight: 600;
+    padding: 20px 0 20px 24px;
+    border-left: 4px solid var(--orange);
+    margin: 28px 0;
+    line-height: 1.5;
+  }
+
+  .panel-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 2px solid var(--orange);
+  }
+
+  .panel-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .panel-nav-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .panel-nav-btn.hidden { visibility: hidden; }
+
+  /* ── Callout ── */
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 28px 0;
+    border-left: 4px solid var(--orange);
+    background: var(--orange-light);
+  }
+
+  .callout-label {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .callout p { font-size: 15px; color: var(--text-secondary); margin-bottom: 0; line-height: 1.65; }
+  .callout p + p { margin-top: 10px; }
+
+  .callout-warning { background: rgba(150, 27, 40, 0.04); border-left-color: var(--red); }
+  .callout-warning .callout-label { color: var(--red); }
+  .callout-info { background: var(--blue-light); border-left-color: var(--blue); }
+  .callout-info .callout-label { color: var(--blue); }
+  .callout-purple { background: var(--purple-light); border-left-color: var(--purple); }
+  .callout-purple .callout-label { color: var(--purple); }
+
+  /* ── Example block ── */
+  .example-block {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 24px 0;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 1px 3px rgba(22,36,49,0.04);
+  }
+  .example-label { font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); margin-bottom: 10px; }
+  .example-block p { font-size: 15px; line-height: 1.65; color: var(--text-secondary); margin-bottom: 0; }
+  .example-block p + p { margin-top: 10px; }
+  .example-block ul { margin: 8px 0 0; padding-left: 0; list-style: none; }
+  .example-block li { font-size: 15px; margin-bottom: 10px; padding-left: 22px; position: relative; line-height: 1.6; color: var(--text-secondary); }
+  .example-block li::before { content: '\2192'; position: absolute; left: 0; color: var(--blue); font-weight: 700; }
+
+  /* ── Comparison boxes ── */
+  .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .comparison-box { padding: 22px 24px; border-radius: var(--radius-sm); }
+  .comparison-box.without { background: #EEEDEB; border: 1px solid var(--border); }
+  .comparison-box.with { background: var(--orange-light); border: 1px solid rgba(239,129,31,0.25); }
+  .comparison-box h4 { font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .comparison-box.without h4 { color: var(--text-muted); }
+  .comparison-box.with h4 { color: var(--orange); }
+  .comparison-box .analogy { font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .comparison-box p { font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 0; }
+
+  /* ── Card grid ── */
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+  .grid-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 20px 22px; box-shadow: 0 1px 3px rgba(22,36,49,0.04); }
+  .grid-card .card-emoji { font-size: 24px; margin-bottom: 10px; }
+  .grid-card h4 { font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .grid-card p { font-size: 14px; line-height: 1.55; color: var(--text-secondary); margin-bottom: 0; }
+
+  /* ── Numbered steps ── */
+  .steps { counter-reset: step; list-style: none; padding-left: 0; margin: 24px 0; }
+  .steps li { counter-increment: step; position: relative; padding-left: 52px; margin-bottom: 28px; }
+  .steps li::before { content: counter(step); position: absolute; left: 0; top: 2px; width: 36px; height: 36px; background: var(--navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 14px; font-weight: 700; }
+  .steps li strong { display: block; font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 16px; color: var(--navy); margin-bottom: 4px; }
+
+  /* ── Symptom list ── */
+  .symptom-item { padding: 16px 0; border-bottom: 1px solid var(--border-light); }
+  .symptom-item:last-child { border-bottom: none; }
+  .symptom-item .symptom-sign { font-size: 16.5px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .symptom-item .symptom-why { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* ── Further reading ── */
+  .further-reading { margin-top: 40px; }
+  .further-reading h3 { margin-top: 0; }
+  .reading-item { padding: 16px 0; border-bottom: 1px solid var(--border-light); }
+  .reading-item:last-child { border-bottom: none; }
+  .reading-item a {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--blue);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .reading-item a:hover { color: var(--orange); }
+  .reading-item p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 4px 0 0;
+    line-height: 1.5;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    html, body { overflow: auto; }
+    .layout { flex-direction: column; }
+    .main { overflow: visible; }
+    .panel { padding: 40px 24px 60px; }
+    .panel h2 { font-size: 26px; }
+    .comparison-grid, .card-grid { grid-template-columns: 1fr; }
+    .mobile-nav { display: flex; }
+  }
+
+  .mobile-nav {
+    display: none;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--navy);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-nav-btn {
+    flex-shrink: 0;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    background: none;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    padding: 6px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .mobile-nav-btn.active { background: var(--orange); color: white; border-color: var(--orange); }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<div class="layout">
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">The Persimmon Group</div>
+    <div class="sidebar-title">Why Long Chats Make ChatGPT <span>Dumber</span></div>
+  </div>
+  <div class="sidebar-nav" id="sidebarNav">
+
+    <a class="nav-item active" data-panel="intro">
+      <span class="nav-icon">🧵</span>
+      <span class="nav-text">
+        <span class="nav-label">The Problem</span>
+        <span class="nav-desc">Why ChatGPT gets worse the longer you talk</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Understanding It</div>
+
+    <a class="nav-item" data-panel="context">
+      <span class="nav-icon">📦</span>
+      <span class="nav-text">
+        <span class="nav-label">The Whiteboard</span>
+        <span class="nav-desc">Tokens, context, and the memory that erases itself</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="disappears">
+      <span class="nav-icon">📉</span>
+      <span class="nav-text">
+        <span class="nav-label">How Context Disappears</span>
+        <span class="nav-desc">The hidden forces that eat your working memory</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="symptoms">
+      <span class="nav-icon">🔍</span>
+      <span class="nav-text">
+        <span class="nav-label">Spot the Drift</span>
+        <span class="nav-desc">Four signs your conversation has gone stale</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Fixing It</div>
+
+    <a class="nav-item" data-panel="short-convos">
+      <span class="nav-icon">✂️</span>
+      <span class="nav-text">
+        <span class="nav-label">Keep Conversations Short</span>
+        <span class="nav-desc">One task per chat, and make each message count</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="frontload">
+      <span class="nav-icon">🎯</span>
+      <span class="nav-text">
+        <span class="nav-label">Front-Load What Matters</span>
+        <span class="nav-desc">Put your best instructions where they'll be heard</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="projects">
+      <span class="nav-icon">📁</span>
+      <span class="nav-text">
+        <span class="nav-label">Use Projects for Repeat Work</span>
+        <span class="nav-desc">Stop re-uploading the same files every time</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="save-tokens">
+      <span class="nav-icon">💡</span>
+      <span class="nav-text">
+        <span class="nav-label">Save Tokens, Better Output</span>
+        <span class="nav-desc">Practical tricks to stretch your working memory</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="handoff">
+      <span class="nav-icon">🔄</span>
+      <span class="nav-text">
+        <span class="nav-label">The Handoff Skill</span>
+        <span class="nav-desc">Continue work across chats without losing context</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="naming">
+      <span class="nav-icon">🏷️</span>
+      <span class="nav-text">
+        <span class="nav-label">Name It, Pin It, Find It</span>
+        <span class="nav-desc">Keep your chat history organized</span>
+      </span>
+    </a>
+
+  </div>
+  <div class="sidebar-footer"><a href="index.html">&larr; Back to all resources</a></div>
+</nav>
+
+<!-- ── Mobile nav ── -->
+<div class="mobile-nav" id="mobileNav"></div>
+
+<!-- ── Main ── -->
+<main class="main" id="mainContent">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- INTRO                                   -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel active" id="panel-intro">
+    <div class="section-number">AI Explainer</div>
+    <h2>Why Long Chats Make ChatGPT Dumber (And How to Fix It)</h2>
+    <p class="lead-text">You're twenty messages into a conversation with ChatGPT. You've uploaded a document, given detailed instructions, iterated on a draft. And then, seemingly out of nowhere, it ignores something you told it ten minutes ago.</p>
+    <p>It contradicts its own earlier answer. It starts sounding generic. The quality just&hellip; drops.</p>
+    <p>You didn't do anything wrong. The tool hit a wall &mdash; one that's invisible unless you know it's there.</p>
+
+    <div class="framing-quote">AI doesn't forget because it's bad at its job. It forgets because its memory is a whiteboard that gets partially erased every time you keep writing on it.</div>
+
+    <p>That wall is the <strong>context window</strong> &mdash; ChatGPT's working memory. Understanding it will change how you use the tool. This guide explains what's happening, how to spot when it's happening to you, and what to do about it.</p>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn hidden">&larr; Previous</button>
+      <button class="panel-nav-btn" onclick="goTo('context')">The Whiteboard &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- THE WHITEBOARD                          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-context">
+    <div class="section-number">Understanding It</div>
+    <h2>The Whiteboard</h2>
+    <p class="lead-text">AI tools don't read words the way you do. They break text into <strong>tokens</strong> &mdash; small chunks that are roughly three-quarters of a word.</p>
+    <p>The sentence "The project manager reviewed the report" is about 7 tokens. A full page of text is around 500&ndash;700 tokens. A 40-page PDF might be 25,000&ndash;35,000 tokens.</p>
+    <p>The <strong>context window</strong> is the total number of tokens ChatGPT can hold in its head at once. Think of it as a whiteboard. Everything goes on it: the behind-the-scenes system instructions, your entire conversation history, any files you've uploaded, <em>and</em> the response being generated right now.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Key concept</div>
+      <p>When the whiteboard fills up, older content gets pushed off the edge. ChatGPT isn't choosing to forget &mdash; it literally can't see what's no longer on the board. Its memory isn't permanent. It's a workspace with a fixed size.</p>
+    </div>
+
+    <p>Every AI tool has a context window, and the numbers vary. But the size of the window is less important than understanding what happens inside it &mdash; which is what the next section covers.</p>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('intro')">&larr; The Problem</button>
+      <button class="panel-nav-btn" onclick="goTo('disappears')">How Context Disappears &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- HOW CONTEXT DISAPPEARS                  -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-disappears">
+    <div class="section-number">Understanding It</div>
+    <h2>How Context Disappears</h2>
+    <p class="lead-text">Even with large context windows, ChatGPT output still degrades in long conversations. Two forces are working against you.</p>
+
+    <h3>The window fills up faster than you think</h3>
+    <p>Your messages are only part of what's on the whiteboard. System prompts (the instructions that tell ChatGPT how to behave), any uploaded documents, project instructions, and connected tools all consume tokens before you type a word. In some setups, 10&ndash;20% of the window is already spoken for before you start.</p>
+    <p>If you've uploaded a 40-page PDF and have detailed project instructions, you may have used 30&ndash;40% of the available space before your first message. Every message you send &mdash; and every response ChatGPT generates &mdash; adds more.</p>
+
+    <h3>Attention degrades before the window fills</h3>
+    <p>This is the subtler problem, and it's the one that catches people off guard. Researchers have documented what's called the <strong>"lost in the middle" problem:</strong> AI pays close attention to the beginning of a conversation and to the most recent messages, but content in the middle gets less reliable attention.</p>
+    <p>A constraint you set on message four of a long thread might be functionally invisible by message twenty &mdash; even though it's technically still in the window. The whiteboard isn't full, but ChatGPT is reading parts of it with less care.</p>
+
+    <div class="comparison-grid">
+      <div class="comparison-box without">
+        <h4>What you expect</h4>
+        <div class="analogy">Equal attention everywhere</div>
+        <p>You assume ChatGPT remembers everything in the conversation equally well, like re-reading your own notes.</p>
+      </div>
+      <div class="comparison-box with">
+        <h4>What actually happens</h4>
+        <div class="analogy">Strong start, weak middle, strong end</div>
+        <p>ChatGPT focuses on the first few messages and the most recent ones. Everything in between gets progressively less attention.</p>
+      </div>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('context')">&larr; The Whiteboard</button>
+      <button class="panel-nav-btn" onclick="goTo('symptoms')">Spot the Drift &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SYMPTOMS                                -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-symptoms">
+    <div class="section-number">Understanding It</div>
+    <h2>Spot the Drift</h2>
+    <p class="lead-text">Now that you know what's happening under the hood, here are the signs that context is degrading. When you notice any of these, don't troubleshoot &mdash; just start a fresh conversation.</p>
+
+    <div class="symptom-item">
+      <div class="symptom-sign">🔄 ChatGPT contradicts something it said earlier</div>
+      <div class="symptom-why">It may no longer be able to "see" that earlier message. It's slid into the low-attention middle zone or been pushed off the whiteboard entirely.</div>
+    </div>
+
+    <div class="symptom-item">
+      <div class="symptom-sign">🚫 It ignores a constraint you set at the beginning</div>
+      <div class="symptom-why">That constraint has drifted into the middle of the context window, where attention is weakest. ChatGPT isn't being defiant &mdash; it's just not weighing that instruction heavily anymore.</div>
+    </div>
+
+    <div class="symptom-item">
+      <div class="symptom-sign">😶‍🌫️ Responses start sounding vague or generic</div>
+      <div class="symptom-why">ChatGPT is working with less specific context than it had earlier. When it can't draw on the details, it falls back on general knowledge. This is the most common symptom and often the first to appear.</div>
+    </div>
+
+    <div class="symptom-item">
+      <div class="symptom-sign">📄 It "forgets" a file you uploaded</div>
+      <div class="symptom-why">The file content may have been compressed or deprioritized to make room for newer messages. The file is still technically "there," but ChatGPT is paying less attention to it.</div>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-label">Watch out</div>
+      <p>By the time you notice these symptoms, ChatGPT has likely been producing degraded output for several messages already. The drift is gradual &mdash; it doesn't announce itself. This is why the habits in the next sections matter: they prevent drift before it becomes visible.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('disappears')">&larr; How Context Disappears</button>
+      <button class="panel-nav-btn" onclick="goTo('short-convos')">Keep Conversations Short &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- KEEP CONVERSATIONS SHORT                -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-short-convos">
+    <div class="section-number">Fixing It</div>
+    <h2>Keep Conversations Short</h2>
+    <p class="lead-text">The single most effective thing you can do is end conversations earlier. But "short" doesn't mean "terse" &mdash; it means focused.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Important distinction</div>
+      <p><strong>Short conversations, comprehensive messages.</strong> A conversation with 5 well-crafted messages will outperform one with 25 quick back-and-forth exchanges every time. The goal is fewer turns, not fewer words per turn. Give ChatGPT everything it needs in one thorough message instead of drip-feeding instructions across a dozen clarifying replies.</p>
+    </div>
+
+    <h3>One task, one conversation</h3>
+    <p>When you finish a task &mdash; a draft, a research question, a brainstorm &mdash; start a new conversation for the next one. Long, multi-topic threads are where context degrades fastest. Think of each conversation as a clean workspace, not a running diary.</p>
+
+    <div class="example-block">
+      <div class="example-label">Example</div>
+      <p>You brainstorm risks for your risk register, and now you want to explore mitigation strategies for each risk. <strong>Start a new chat</strong> for the mitigations. The risk brainstorm conversation has used context that's now irrelevant &mdash; it's sitting in the middle of the window, taking up space and diluting ChatGPT's attention on your new task.</p>
+    </div>
+
+    <h3>Batch your feedback</h3>
+    <p>Ten short back-and-forth exchanges ("change the header," "now fix the font," "make it bolder") consume far more context than one message that says all of it at once. When you have feedback on a draft, collect your thoughts and send them in a single message. You'll get better results <em>and</em> use less of the window.</p>
+
+    <div class="comparison-grid">
+      <div class="comparison-box without">
+        <h4>Token-heavy</h4>
+        <div class="analogy">"Change the header"</div>
+        <p>"Now make it bold." "Actually, fix the spacing too." "And change that word to..." Each message + response = more tokens burned on the same task.</p>
+      </div>
+      <div class="comparison-box with">
+        <h4>Token-efficient</h4>
+        <div class="analogy">"Here are all my edits"</div>
+        <p>One message with everything: header, font, spacing, word choice. One response back. Same result, a fraction of the context used.</p>
+      </div>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('symptoms')">&larr; Spot the Drift</button>
+      <button class="panel-nav-btn" onclick="goTo('frontload')">Front-Load What Matters &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- FRONT-LOAD WHAT MATTERS                 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-frontload">
+    <div class="section-number">Fixing It</div>
+    <h2>Front-Load What Matters</h2>
+    <p class="lead-text">Where you put your instructions matters as much as what you say. ChatGPT pays the most attention to the beginning of the conversation and the most recent messages. Use that to your advantage.</p>
+
+    <p>Put your most important constraints, requirements, and context in your <strong>first message</strong>. If you're working inside a project, put them in the project's custom instructions so they're loaded at the top of every conversation automatically.</p>
+
+    <p>Anything you mention casually in the middle of a long thread &mdash; a formatting preference, a constraint, a key requirement &mdash; is at risk of being under-weighted as the conversation grows. If it matters, say it first.</p>
+
+    <div class="example-block">
+      <div class="example-label">Example</div>
+      <p><strong>Instead of this:</strong> You start a chat, go back and forth for 10 messages, and then mention "oh, and the audience is senior executives, so keep it concise."</p>
+      <p><strong>Do this:</strong> Open with "I need a summary of this report for senior executives. Keep it concise and focus on timeline risks." The audience and tone are right where ChatGPT will pay the most attention to them.</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Pro tip</div>
+      <p>A long, detailed first message is <em>better</em> than a short one that requires 10 follow-up clarifications. One thorough prompt that includes your audience, constraints, format, and desired outcome will produce a stronger first draft &mdash; and use far less of the context window than a back-and-forth interrogation to get those same details.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('short-convos')">&larr; Keep Conversations Short</button>
+      <button class="panel-nav-btn" onclick="goTo('projects')">Use Projects &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- USE PROJECTS                            -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-projects">
+    <div class="section-number">Fixing It</div>
+    <h2>Use Projects for Repeat Work</h2>
+    <p class="lead-text">If you find yourself uploading the same documents or re-typing the same instructions across multiple conversations, a ChatGPT Project can save you the overhead.</p>
+
+    <p>A project gives you a persistent workspace with its own custom instructions and a knowledge library of uploaded files. Every conversation you start inside that project automatically has access to those instructions and files &mdash; no re-uploading, no re-explaining. That means you start each conversation with more of your context window available for the actual work.</p>
+
+    <h3>When to use a project</h3>
+    <p>Projects are worth setting up when you have recurring work that involves the same context: a client engagement, an ongoing writing project, a set of reference documents you consult regularly. If you're doing the same setup at the start of multiple conversations, that's your cue.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Good to know</div>
+      <p>When the files in your project's knowledge library are small enough, ChatGPT loads all of them directly into every conversation. But once the library grows past a certain size, ChatGPT switches to a search mode &mdash; it doesn't read all your files up front, but searches them on demand and pulls in relevant sections. This is usually seamless, but it means ChatGPT might miss a relevant passage if your question doesn't trigger the right search. <strong>Tip:</strong> use clear, descriptive filenames, and reference specific documents by name when asking questions.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('frontload')">&larr; Front-Load What Matters</button>
+      <button class="panel-nav-btn" onclick="goTo('save-tokens')">Save Tokens &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SAVE TOKENS                             -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-save-tokens">
+    <div class="section-number">Fixing It</div>
+    <h2>Save Tokens, Get Better Output</h2>
+    <p class="lead-text">Every message you send &mdash; and every response ChatGPT generates &mdash; takes up space on the whiteboard. Here are a few more ways to make that space go further.</p>
+
+    <h3>Don't re-upload files mid-conversation</h3>
+    <p>If you uploaded a document at the start of a chat, ChatGPT already has it. Re-uploading the same file adds a second copy to the context window, wasting space. If ChatGPT seems to have lost track of a file, that's a symptom of context degradation &mdash; the fix is a new conversation, not a re-upload.</p>
+
+    <h3>Watch for invisible overhead</h3>
+    <p>System prompts, tool configurations, custom instructions, and connected integrations all consume tokens before you type a word. In some setups, 10&ndash;20% of the window is spoken for before you start. If you're using a project with custom instructions <em>and</em> uploaded files <em>and</em> connected tools, you may have less working room than you think.</p>
+
+    <div class="callout">
+      <div class="callout-label">Pro tip</div>
+      <p>If performance seems off from the very first message in a project, the invisible overhead may be the reason. Try simplifying the project instructions or reducing the number of files in the knowledge library to free up space.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('projects')">&larr; Use Projects</button>
+      <button class="panel-nav-btn" onclick="goTo('handoff')">The Handoff Skill &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- HANDOFF SKILL                           -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-handoff">
+    <div class="section-number">Fixing It</div>
+    <h2>The Handoff Skill</h2>
+    <p class="lead-text">Sometimes a conversation needs to end before the work is done. You've been iterating on a draft, building out an outline, or working through a complex problem &mdash; and the chat is getting long. How do you continue in a fresh conversation without losing everything?</p>
+
+    <p>You could do it manually: ask ChatGPT to summarize where you left off, copy the summary, open a new chat, and paste it as your first message. That works, but it's clunky and you'll inevitably miss something important.</p>
+
+    <p>That's why we have a <strong>handoff skill</strong> built into our ChatGPT Team workspace.</p>
+
+    <h3>What it does</h3>
+    <p>The handoff skill generates a portable state snapshot &mdash; everything the next conversation needs to pick up where you left off, packaged cleanly and ready to go. It produces three things:</p>
+
+    <div class="card-grid">
+      <div class="grid-card">
+        <div class="card-emoji">📋</div>
+        <h4>A handoff document</h4>
+        <p>A structured summary of what you were working on, what decisions were made, what's still open, and what the next conversation needs to know.</p>
+      </div>
+      <div class="grid-card">
+        <div class="card-emoji">📎</div>
+        <h4>Your work-in-progress files</h4>
+        <p>Any drafts or artifacts you've been iterating on, exported as separate files you can carry forward to the next conversation.</p>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="grid-card">
+        <div class="card-emoji">💬</div>
+        <h4>An opening prompt</h4>
+        <p>A ready-to-paste message that starts your new conversation. It tells ChatGPT to read the handoff first and states the specific next step.</p>
+      </div>
+    </div>
+
+    <h3>How to use it</h3>
+    <p>You can say something like <strong>"let's do a handoff,"</strong> or <strong>"let's hand this off,"</strong> or just type <strong>/handoff</strong>. Then follow these steps:</p>
+
+    <ol class="steps">
+      <li>
+        <strong>Download the files</strong>
+        ChatGPT will generate the handoff document and export any in-progress drafts as separate files. Download them.
+      </li>
+      <li>
+        <strong>Start a new conversation and upload the files</strong>
+        Open a fresh chat (in the same project, if applicable), and attach the handoff document and any artifact files.
+      </li>
+      <li>
+        <strong>Paste the opening prompt as your first message</strong>
+        The skill gives you a ready-made opening message. Copy it, paste it into the new conversation, and you're right back where you left off.
+      </li>
+    </ol>
+
+    <div class="callout">
+      <div class="callout-label">Pro tip</div>
+      <p>Don't wait until the conversation feels broken to hand off. If you're past 15&ndash;20 exchanges and the work isn't done, that's a good time to hand off proactively. The handoff will be cleaner and the next conversation will perform better than one that inherited a degraded context.</p>
+    </div>
+
+    <div class="callout callout-purple">
+      <div class="callout-label">Where to find it</div>
+      <p>The handoff skill is available in our shared ChatGPT Team workspace. Just say "let's hand this off" or type /handoff in any conversation.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('save-tokens')">&larr; Save Tokens</button>
+      <button class="panel-nav-btn" onclick="goTo('naming')">Name It, Pin It, Find It &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- NAMING AND PINNING                      -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="panel" id="panel-naming">
+    <div class="section-number">Fixing It</div>
+    <h2>Name It, Pin It, Find It</h2>
+    <p class="lead-text">When you're working in short, focused conversations &mdash; especially multi-part projects that span several chats &mdash; finding the right one later becomes its own challenge. A few simple habits make this painless.</p>
+
+    <h3>Name your conversations</h3>
+    <p>ChatGPT auto-generates chat titles, and they're almost always useless. "Help with document" tells you nothing a week later. As soon as you start a conversation that matters, rename it to something descriptive &mdash; a short phrase that captures the topic so you can recognize it at a glance.</p>
+
+    <div class="example-block">
+      <div class="example-label">Good names</div>
+      <ul>
+        <li>"Acme risk register brainstorm"</li>
+        <li>"Leadership course module 3 outline"</li>
+        <li>"Q3 report data analysis"</li>
+      </ul>
+    </div>
+
+    <p>Keep it short enough that it won't get cut off in the sidebar. The goal is quick recognition, not a full description.</p>
+
+    <h3>Pin active work</h3>
+    <p>ChatGPT lets you pin conversations so they stay at the top of your chat list. When you have active, in-progress work, <strong>pin that conversation</strong> so you can find it instantly. When the work is done (or you hand it off to a new chat), unpin the old one and pin the new one.</p>
+
+    <div class="callout">
+      <div class="callout-label">One approach: the NTC prefix</div>
+      <p>When you have an active conversation you need to come back to, try adding <strong>NTC</strong> (Need to Complete) to the front of the name and pinning it. "NTC - Acme risk register" is immediately recognizable as an open task. When you're done, remove the prefix and unpin it. This keeps your pinned conversations clearly separated from your archive.</p>
+    </div>
+
+    <h3>Search when you need history</h3>
+    <p>If you've named your conversations well, finding an older one is easy. ChatGPT has search built into the sidebar. A search for "Acme" or "risk register" will pull up every related conversation. No more scrolling through a long list of "Untitled Chat" entries.</p>
+
+    <div class="further-reading">
+      <h3>Further reading</h3>
+
+      <div class="reading-item">
+        <a href="https://platform.openai.com/docs/guides/conversation-management" target="_blank">Conversation Management &mdash; OpenAI Docs</a>
+        <p>OpenAI's official guidance on how ChatGPT handles context windows, including how conversations are managed as they grow.</p>
+      </div>
+
+      <div class="reading-item">
+        <a href="https://arxiv.org/abs/2307.03172" target="_blank">Lost in the Middle &mdash; Stanford / UC Berkeley (2023)</a>
+        <p>The foundational research paper documenting how AI attention degrades in the middle of long contexts. Academic but accessible.</p>
+      </div>
+
+      <div class="reading-item">
+        <a href="https://help.openai.com/en/articles/10265769-using-projects-in-chatgpt" target="_blank">Using Projects in ChatGPT &mdash; OpenAI Help</a>
+        <p>How to set up and use project spaces in ChatGPT Team, including custom instructions and the knowledge library.</p>
+      </div>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('handoff')">&larr; The Handoff Skill</button>
+      <button class="panel-nav-btn hidden">Next &rarr;</button>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  const panels = document.querySelectorAll('.panel');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const panelOrder = ['intro', 'context', 'disappears', 'symptoms', 'short-convos', 'frontload', 'projects', 'save-tokens', 'handoff', 'naming'];
+
+  function goTo(id) {
+    panels.forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('panel-' + id);
+    if (target) {
+      target.classList.add('active');
+      target.style.animation = 'none';
+      target.offsetHeight;
+      target.style.animation = '';
+    }
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.panel === id));
+    document.getElementById('mainContent').scrollTop = 0;
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.panel === id);
+    });
+  }
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => goTo(item.dataset.panel));
+  });
+
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileLabels = {
+    intro: 'Start',
+    context: 'Whiteboard',
+    disappears: 'Disappears',
+    symptoms: 'Spot Drift',
+    'short-convos': 'Short Convos',
+    frontload: 'Front-Load',
+    projects: 'Projects',
+    'save-tokens': 'Save Tokens',
+    handoff: 'Handoff',
+    naming: 'Name & Pin'
+  };
+
+  panelOrder.forEach(id => {
+    const btn = document.createElement('button');
+    btn.className = 'mobile-nav-btn' + (id === panelOrder[0] ? ' active' : '');
+    btn.textContent = mobileLabels[id] || id;
+    btn.dataset.panel = id;
+    btn.addEventListener('click', () => goTo(id));
+    mobileNav.appendChild(btn);
+  });
+</script>
+
+</body>
+</html>
