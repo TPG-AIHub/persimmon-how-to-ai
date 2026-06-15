@@ -83,4 +83,466 @@
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color:
+    color: var(--taupe);
+    margin-bottom: 14px;
+  }
+
+  .hero h1 {
+    font-family: 'Century Gothic', Arial, sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 span {
+    color: var(--orange);
+  }
+
+  .hero .subtitle {
+    font-size: 17px;
+    color: rgba(255,255,255,0.6);
+    max-width: 480px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  .hero .search-bar {
+    position: relative;
+    width: 340px;
+  }
+
+  .hero .search-bar input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    background: rgba(255,255,255,0.08);
+    color: #FFFFFF;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .hero .search-bar input:focus {
+    background: rgba(255,255,255,0.14);
+    border-color: var(--orange);
+  }
+
+  .hero .search-bar input::placeholder { color: rgba(255,255,255,0.45); }
+
+  .hero .search-bar svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* ── Tags ── */
+  .tag {
+    display: inline-block;
+    font-family: 'Century Gothic', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+
+  .tag-tutorial { background: var(--tag-tutorial-bg); color: var(--tag-tutorial); }
+  .tag-explainer { background: var(--tag-explainer-bg); color: var(--tag-explainer); }
+  .tag-news { background: var(--tag-news-bg); color: var(--tag-news); }
+  .tag-prompt-library { background: var(--tag-prompt-library-bg); color: var(--tag-prompt-library); }
+
+  /* ── Content Section ── */
+  .content-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 48px 64px;
+  }
+
+  /* ── Filter Bar ── */
+  .filter-bar {
+    margin-bottom: 24px;
+  }
+
+  .filter-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-pill {
+    padding: 7px 18px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: Arial, sans-serif;
+  }
+
+  .filter-pill:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+
+  .filter-pill.active {
+    background: var(--orange);
+    color: white;
+    border-color: var(--orange);
+  }
+
+  /* ── Resource Cards ── */
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .resource-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    border-left: 3px solid transparent;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .resource-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    border-left-color: var(--orange);
+  }
+
+  .resource-card .card-top {
+    margin-bottom: 14px;
+  }
+
+  .resource-card .card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background: var(--orange-light);
+  }
+
+  .resource-card h3 {
+    font-family: 'Century Gothic', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .resource-card p {
+    font-size: 15.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .resource-card .card-date {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 14px;
+  }
+
+  .resource-card .card-footer {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  /* ── Empty state ── */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 64px 24px;
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  .empty-state .empty-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .resource-card {
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .resource-card:nth-child(1) { animation-delay: 0.1s; }
+  .resource-card:nth-child(2) { animation-delay: 0.15s; }
+  .resource-card:nth-child(3) { animation-delay: 0.2s; }
+  .resource-card:nth-child(4) { animation-delay: 0.25s; }
+  .resource-card:nth-child(5) { animation-delay: 0.3s; }
+  .resource-card:nth-child(6) { animation-delay: 0.35s; }
+  .resource-card:nth-child(7) { animation-delay: 0.4s; }
+  .resource-card:nth-child(8) { animation-delay: 0.45s; }
+  .resource-card:nth-child(9) { animation-delay: 0.5s; }
+
+  /* ── Footer ── */
+  .site-footer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 48px;
+    border-top: 2px solid var(--orange);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .site-footer strong {
+    color: var(--navy);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .resource-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero, .content-section { padding-left: 24px; padding-right: 24px; }
+    .hero .search-bar { width: 100%; }
+  }
+
+  @media (max-width: 600px) {
+    .resource-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <svg class="hero-network" viewBox="0 0 1200 240" preserveAspectRatio="xMidYMid slice">
+    <!-- Network connections -->
+    <line x1="720" y1="55" x2="850" y2="95" stroke="rgba(239,129,31,0.12)" stroke-width="1"/>
+    <line x1="850" y1="95" x2="940" y2="50" stroke="rgba(239,129,31,0.10)" stroke-width="1"/>
+    <line x1="850" y1="95" x2="920" y2="155" stroke="rgba(239,129,31,0.08)" stroke-width="1"/>
+    <line x1="920" y1="155" x2="1050" y2="125" stroke="rgba(239,129,31,0.10)" stroke-width="1"/>
+    <line x1="940" y1="50" x2="1060" y2="72" stroke="rgba(239,129,31,0.07)" stroke-width="1"/>
+    <line x1="720" y1="55" x2="780" y2="140" stroke="rgba(239,129,31,0.09)" stroke-width="1"/>
+    <line x1="780" y1="140" x2="920" y2="155" stroke="rgba(239,129,31,0.07)" stroke-width="1"/>
+    <line x1="1050" y1="125" x2="1100" y2="195" stroke="rgba(239,129,31,0.06)" stroke-width="1"/>
+    <line x1="780" y1="140" x2="720" y2="195" stroke="rgba(239,129,31,0.06)" stroke-width="1"/>
+    <line x1="850" y1="95" x2="810" y2="35" stroke="rgba(239,129,31,0.07)" stroke-width="1"/>
+    <line x1="1050" y1="125" x2="1130" y2="85" stroke="rgba(239,129,31,0.08)" stroke-width="1"/>
+    <line x1="1130" y1="85" x2="1160" y2="140" stroke="rgba(239,129,31,0.05)" stroke-width="1"/>
+    <!-- Secondary cluster -->
+    <line x1="600" y1="180" x2="720" y2="195" stroke="rgba(172,160,149,0.06)" stroke-width="1"/>
+    <line x1="720" y1="195" x2="800" y2="215" stroke="rgba(172,160,149,0.05)" stroke-width="1"/>
+    <line x1="920" y1="155" x2="880" y2="210" stroke="rgba(172,160,149,0.05)" stroke-width="1"/>
+    <line x1="650" y1="30" x2="720" y2="55" stroke="rgba(172,160,149,0.04)" stroke-width="1"/>
+    <!-- Primary nodes (double-circle glow) -->
+    <circle cx="720" cy="55" r="4" fill="rgba(239,129,31,0.25)"/>
+    <circle cx="720" cy="55" r="1.8" fill="rgba(239,129,31,0.6)"/>
+    <circle cx="850" cy="95" r="5" fill="rgba(239,129,31,0.20)"/>
+    <circle cx="850" cy="95" r="2.2" fill="rgba(239,129,31,0.55)"/>
+    <circle cx="940" cy="50" r="3.5" fill="rgba(239,129,31,0.18)"/>
+    <circle cx="940" cy="50" r="1.5" fill="rgba(239,129,31,0.5)"/>
+    <circle cx="920" cy="155" r="4.5" fill="rgba(239,129,31,0.15)"/>
+    <circle cx="920" cy="155" r="2" fill="rgba(239,129,31,0.45)"/>
+    <circle cx="1050" cy="125" r="3" fill="rgba(239,129,31,0.15)"/>
+    <circle cx="1050" cy="125" r="1.3" fill="rgba(239,129,31,0.45)"/>
+    <circle cx="780" cy="140" r="3.5" fill="rgba(239,129,31,0.13)"/>
+    <circle cx="780" cy="140" r="1.5" fill="rgba(239,129,31,0.4)"/>
+    <circle cx="1060" cy="72" r="2.5" fill="rgba(239,129,31,0.10)"/>
+    <circle cx="1060" cy="72" r="1" fill="rgba(239,129,31,0.35)"/>
+    <circle cx="810" cy="35" r="2.5" fill="rgba(239,129,31,0.10)"/>
+    <circle cx="810" cy="35" r="1" fill="rgba(239,129,31,0.35)"/>
+    <circle cx="1130" cy="85" r="2.5" fill="rgba(239,129,31,0.10)"/>
+    <circle cx="1130" cy="85" r="1" fill="rgba(239,129,31,0.35)"/>
+    <!-- Faint scatter nodes -->
+    <circle cx="720" cy="195" r="2.5" fill="rgba(172,160,149,0.12)"/>
+    <circle cx="720" cy="195" r="1" fill="rgba(172,160,149,0.3)"/>
+    <circle cx="1100" cy="195" r="2" fill="rgba(172,160,149,0.10)"/>
+    <circle cx="1100" cy="195" r="0.8" fill="rgba(172,160,149,0.25)"/>
+    <circle cx="600" cy="180" r="2" fill="rgba(172,160,149,0.08)"/>
+    <circle cx="800" cy="215" r="1.5" fill="rgba(172,160,149,0.06)"/>
+    <circle cx="880" cy="210" r="1.5" fill="rgba(172,160,149,0.06)"/>
+    <circle cx="650" cy="30" r="1.5" fill="rgba(172,160,149,0.06)"/>
+    <circle cx="1160" cy="140" r="1.5" fill="rgba(172,160,149,0.05)"/>
+    <circle cx="1000" cy="200" r="1" fill="rgba(172,160,149,0.05)"/>
+    <circle cx="1080" cy="30" r="1" fill="rgba(172,160,149,0.04)"/>
+  </svg>
+
+  <div class="hero-inner">
+    <div class="hero-brand">The Persimmon Group</div>
+    <h1>How to <span>AI</span></h1>
+    <p class="subtitle">Persimmon explainers, tutorials, and hot takes to help you work smarter with AI.</p>
+    <div class="search-bar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search resources..." oninput="handleSearch(this.value)">
+    </div>
+  </div>
+</section>
+
+<!-- ── All Resources ── -->
+<section class="content-section">
+  <div class="filter-bar">
+    <div class="filter-pills">
+      <button class="filter-pill active" onclick="filterBy('all')">All</button>
+      <button class="filter-pill" onclick="filterBy('explainer')">AI Explainers</button>
+      <button class="filter-pill" onclick="filterBy('tutorial')">AI Tutorials</button>
+      <button class="filter-pill" onclick="filterBy('news')">AI News</button>
+      <button class="filter-pill" onclick="filterBy('prompt-library')">Prompt Library</button>
+    </div>
+  </div>
+
+  <div class="resource-grid" id="resourceGrid">
+<a class="resource-card" href="business-requirements-prompt-library.html" data-category="prompt-library" data-type="Prompt Library">
+  <div class="card-top">
+    <div class="card-icon">🧰</div>
+  </div>
+  <h3>Business Analysis Toolkit</h3>
+  <p>Drawn from our Business Requirements class, these prompts are a powerful toolkit for managing requirements from concept to completion.</p>
+  <div class="card-date">June 15, 2026</div>
+  <div class="card-footer">
+    <span class="tag tag-prompt-library">Prompt Library</span>
+  </div>
+</a>
+
+
+<a class="resource-card" href="ai-beyond-the-chat-box.html" data-category="explainer" data-type="AI Explainers">
+  <div class="card-top">
+    <div class="card-icon">💡</div>
+  </div>
+  <h3>What AI Can Actually Do (Beyond Chat)</h3>
+  <p>You're already using the chat window. Here's what's happening behind it — and why it changes how you work.</p>
+  <div class="card-date">May 26, 2026</div>
+  <div class="card-footer">
+    <span class="tag tag-explainer">AI Explainers</span>
+  </div>
+</a>
+
+<a class="resource-card" href="skills-what-they-are-and-when-they-matter.html" data-category="explainer" data-type="AI Explainers">
+  <div class="card-top">
+    <div class="card-icon">⚡</div>
+  </div>
+  <h3>Skills: Your Shortcut to Skipping Repetitive Work</h3>
+  <p>ChatGPT's most underrated feature. What skills are, when they matter, and why you'll wish you'd started sooner.</p>
+  <div class="card-date">May 26, 2026</div>
+  <div class="card-footer">
+    <span class="tag tag-explainer">AI Explainers</span>
+  </div>
+</a>
+
+<a class="resource-card" href="how-to-build-a-skill-in-chatgpt.html" data-category="tutorial" data-type="AI Tutorials">
+  <div class="card-top">
+    <div class="card-icon">🛠️</div>
+  </div>
+  <h3>Build Your First Skill in 15 Minutes</h3>
+  <p>Three ways to build a skill — from scratch, from a conversation, or with the Skill Builder. Pick the one that fits.</p>
+  <div class="card-date">May 26, 2026</div>
+  <div class="card-footer">
+    <span class="tag tag-tutorial">AI Tutorials</span>
+  </div>
+</a>
+
+<a class="resource-card" href="how-to-train-chatgpt-to-write-with-your-voice.html" data-category="tutorial" data-type="AI Tutorials">
+  <div class="card-top">
+    <div class="card-icon">🎙️</div>
+  </div>
+  <h3>Teach ChatGPT to Write Like You</h3>
+  <p>Stop rewriting every draft. Build a voice skill and get output that actually sounds like you wrote it.</p>
+  <div class="card-date">May 26, 2026</div>
+  <div class="card-footer">
+    <span class="tag tag-tutorial">AI Tutorials</span>
+  </div>
+</a>
+
+<a class="resource-card" href="why-ai-loses-the-thread.html" data-category="explainer" data-type="AI Explainers">
+  <div class="card-top">
+    <div class="card-icon">🧠</div>
+  </div>
+  <h3>Why Long Chats Make ChatGPT Dumber</h3>
+  <p>It's not you — it's the context window. Here's why quality drops and three ways to fix it.</p>
+  <div class="card-date">May 26, 2026</div>
+  <div class="card-footer">
+    <span class="tag tag-explainer">AI Explainers</span>
+  </div>
+</a>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <p><strong>The Persimmon Group</strong> · How to AI · Last updated June 15, 2026</p>
+</footer>
+
+<script>
+  function filterBy(category) {
+    const pills = document.querySelectorAll('.filter-pill');
+    pills.forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const cards = document.querySelectorAll('.resource-card');
+    cards.forEach(card => {
+      if (category === 'all' || card.dataset.category === category) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+    checkEmpty();
+  }
+
+  function handleSearch(query) {
+    const q = query.toLowerCase().trim();
+    const cards = document.querySelectorAll('.resource-card');
+
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    document.querySelector('.filter-pill').classList.add('active');
+
+    cards.forEach(card => {
+      const text = card.textContent.toLowerCase();
+      card.style.display = (!q || text.includes(q)) ? '' : 'none';
+    });
+    checkEmpty();
+  }
+
+  function checkEmpty() {
+    const grid = document.getElementById('resourceGrid');
+    const visible = grid.querySelectorAll('.resource-card:not([style*="display: none"])');
+    let empty = grid.querySelector('.empty-state');
+
+    if (visible.length === 0) {
+      if (!empty) {
+        empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.innerHTML = '<div class="empty-icon">🔍</div><p>No resources match your search. Try a different term or filter.</p>';
+        grid.appendChild(empty);
+      }
+    } else if (empty) {
+      empty.remove();
+    }
+  }
+</script>
+
+</body>
+</html>
