@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Business Requirements Prompt Library | The Persimmon Group</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --navy: #162431;
+    --orange: #EF811F;
+    --blue: #114973;
+    --red: #961B28;
+    --purple: #55233D;
+    --taupe: #ACA095;
+    --bg: #F7F6F4;
+    --surface: #FFFFFF;
+    --text-primary: #162431;
+    --text-secondary: #3A4A5A;
+    --text-muted: #6B7A8A;
+    --border: #D9D5CF;
+    --border-light: #E7E6E6;
+    --orange-light: #FEF3E6;
+    --blue-light: #EAF0F7;
+    --purple-light: #F3EBF0;
+    --sidebar-width: 300px;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'DM Sans', Arial, sans-serif;
+    color: var(--text-primary);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top-bar { height: 4px; background: var(--orange); flex-shrink: 0; }
+  .layout { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 28px 24px 24px;
+    border-bottom: 2px solid var(--orange);
+  }
+
+  .sidebar-brand {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--taupe);
+    margin-bottom: 6px;
+  }
+
+  .sidebar-title {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.2;
+  }
+
+  .sidebar-title span { color: var(--orange); }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+  .nav-group-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--taupe);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 20px 24px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); }
+
+  .nav-item.active {
+    background: rgba(239, 129, 31, 0.08);
+    border-left-color: var(--orange);
+  }
+
+  .nav-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    width: 24px;
+    text-align: center;
+  }
+
+  .nav-text { flex: 1; }
+
+  .nav-label {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: rgba(255,255,255,0.6);
+    display: block;
+  }
+
+  .nav-item.active .nav-label { color: #FFFFFF; }
+
+  .nav-desc {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.4;
+    margin-top: 3px;
+    display: block;
+  }
+
+  .nav-item.active .nav-desc { color: rgba(255,255,255,0.5); }
+
+  .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 11px;
+    color: var(--taupe);
+    text-align: center;
+  }
+
+  .sidebar-footer a { color: var(--orange); text-decoration: none; }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg);
+    scroll-behavior: smooth;
+  }
+
+  .main::-webkit-scrollbar { width: 6px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+  .panel {
+    display: none;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 48px 80px;
+    animation: panelIn 0.3s ease both;
+  }
+
+  .panel.active { display: block; }
+
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-number {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .panel h2 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .panel h3 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-top: 40px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .panel h3:first-of-type { margin-top: 28px; }
+
+  .panel p {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.8;
+  }
+
+  .panel strong { color: var(--text-primary); font-weight: 700; }
+  .panel em { font-style: italic; }
+
+  .panel ul, .panel ol {
+    margin-bottom: 20px;
+    padding-left: 24px;
+  }
+
+  .panel li {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    line-height: 1.7;
+  }
+
+  .lead-text {
+    font-size: 19px;
+    line-height: 1.7;
+    color: var(--navy);
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  .framing-quote {
+    font-size: 20px;
+    font-style: italic;
+    color: var(--navy);
+    font-weight: 600;
+    padding: 20px 0 20px 24px;
+    border-left: 4px solid var(--orange);
+    margin: 28px 0;
+    line-height: 1.5;
+  }
+
+  .panel-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 2px solid var(--orange);
+  }
+
+  .panel-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .panel-nav-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .panel-nav-btn.hidden { visibility: hidden; }
+
+  /* ── Callout ── */
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 28px 0;
+    border-left: 4px solid var(--orange);
+    background: var(--orange-light);
+  }
+
+  .callout-label {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .callout p { font-size: 15px; color: var(--text-secondary); margin-bottom: 0; line-height: 1.65; }
+  .callout p + p { margin-top: 10px; }
+
+  .callout-warning { background: rgba(150, 27, 40, 0.04); border-left-color: var(--red); }
+  .callout-warning .callout-label { color: var(--red); }
+  .callout-info { background: var(--blue-light); border-left-color: var(--blue); }
+  .callout-info .callout-label { color: var(--blue); }
+  .callout-purple { background: var(--purple-light); border-left-color: var(--purple); }
+  .callout-purple .callout-label { color: var(--purple); }
+
+  /* ── Example block ── */
+  .example-block {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 24px 0;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 1px 3px rgba(22,36,49,0.04);
+  }
+  .example-label { font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); margin-bottom: 10px; }
+  .example-block p { font-size: 15px; line-height: 1.65; color: var(--text-secondary); margin-bottom: 0; }
+  .example-block p + p { margin-top: 10px; }
+  .example-block ul { margin: 8px 0 0; padding-left: 0; list-style: none; }
+  .example-block li { font-size: 15px; margin-bottom: 10px; padding-left: 22px; position: relative; line-height: 1.6; color: var(--text-secondary); }
+  .example-block li::before { content: '\2192'; position: absolute; left: 0; color: var(--blue); font-weight: 700; }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    html, body { overflow: auto; }
+    .layout { flex-direction: column; }
+    .main { overflow: visible; }
+    .panel { padding: 40px 24px 60px; }
+    .panel h2 { font-size: 26px; }
+    .mobile-nav { display: flex; }
+  }
+
+  .mobile-nav {
+    display: none;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--navy);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-nav-btn {
+    flex-shrink: 0;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    background: none;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    padding: 6px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .mobile-nav-btn.active { background: var(--orange); color: white; border-color: var(--orange); }
+
+  /* ── Readability overrides ── */
+  .nav-label { font-size:15.5px; color:rgba(255,255,255,0.78); }
+  .nav-item.active .nav-label { color:#FFFFFF; }
+  .nav-desc { font-size:13px; color:rgba(255,255,255,0.55); margin-top:4px; }
+  .nav-item.active .nav-desc { color:rgba(255,255,255,0.7); }
+  .example-label { font-size:13px; }
+  .example-block p, .example-block li { font-size:16px; }
+  .callout-label { font-size:12.5px; }
+  .callout p { font-size:16px; }
+  .pc-label { font-size:12.5px; }
+  /* ── Kind tag ── */
+  .kind-tag { display:inline-block; font-family:'Century Gothic','DM Sans',Arial,sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; padding:5px 13px; border-radius:30px; margin-bottom:24px; }
+  .kind-do { background:var(--navy); color:#FFFFFF; }
+  .kind-guided { background:var(--orange-light); color:var(--orange); border:1px solid rgba(239,129,31,0.45); }
+  /* ── Copyable prompt card ── */
+  .prompt-card { background:var(--surface); border:1px solid var(--border-light); border-left:3px solid var(--orange); border-radius:0 var(--radius) var(--radius) 0; margin:24px 0; box-shadow:0 1px 3px rgba(22,36,49,0.05); overflow:hidden; }
+  .prompt-card-head { display:flex; justify-content:space-between; align-items:center; background:var(--navy); padding:11px 18px; }
+  .pc-label { font-family:'Century Gothic','DM Sans',Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--orange); }
+  .pc-copy { font-family:'DM Sans',Arial,sans-serif; font-size:12.5px; font-weight:600; color:var(--navy); background:var(--orange); border:none; border-radius:30px; padding:7px 16px; cursor:pointer; }
+  .pc-copy:hover { filter:brightness(1.05); }
+  .pc-copy.copied { background:#2F7A4A; color:#FFFFFF; }
+  .prompt-card pre { margin:0; padding:22px; white-space:pre-wrap; word-wrap:break-word; font-family:'DM Sans',Arial,sans-serif; font-size:14.5px; line-height:1.7; color:var(--text-primary); }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<div class="layout">
+
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">The Persimmon Group</div>
+    <div class="sidebar-title">The Business Requirements <span>Prompt Library</span></div>
+  </div>
+  <div class="sidebar-nav" id="sidebarNav">
+
+    <div class="nav-group-label">Start Here</div>
+    <a class="nav-item active" data-panel="intro">
+      <span class="nav-icon">🧭</span>
+      <span class="nav-text">
+        <span class="nav-label">How to Use This Library</span>
+        <span class="nav-desc">What this is and how to use it</span>
+      </span>
+    </a>
+    <a class="nav-item" data-panel="habits">
+      <span class="nav-icon">🔄</span>
+      <span class="nav-text">
+        <span class="nav-label">Tip: Keep Chats Short</span>
+        <span class="nav-desc">Why fresh chats beat one long one</span>
+      </span>
+    </a>
+    <a class="nav-item" data-panel="carry">
+      <span class="nav-icon">🔗</span>
+      <span class="nav-text">
+        <span class="nav-label">Carry Context to a New Chat</span>
+        <span class="nav-desc">Hand off without re-explaining</span>
+      </span>
+    </a>
+    <a class="nav-item" data-panel="brief">
+      <span class="nav-icon">📋</span>
+      <span class="nav-text">
+        <span class="nav-label">Build Your Project Brief</span>
+        <span class="nav-desc">Run this first · a reusable brief</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Start with Stakeholders</div>
+    <a class="nav-item" data-panel="stakeholders">
+      <span class="nav-icon">🕵️</span>
+      <span class="nav-text">
+        <span class="nav-label">Find the Missed Stakeholders</span>
+        <span class="nav-desc">The people you are most likely to miss</span>
+      </span>
+    </a>
+    <a class="nav-item" data-panel="drivers">
+      <span class="nav-icon">🧲</span>
+      <span class="nav-text">
+        <span class="nav-label">Map Stakeholder Drivers</span>
+        <span class="nav-desc">Likely drivers by role, as a register</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Plan Your Approach</div>
+    <a class="nav-item" data-panel="plan">
+      <span class="nav-icon">🗺️</span>
+      <span class="nav-text">
+        <span class="nav-label">Draft Your Requirements Plan</span>
+        <span class="nav-desc">Guided · from define to test</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Define Success</div>
+    <a class="nav-item" data-panel="outcome">
+      <span class="nav-icon">🎯</span>
+      <span class="nav-text">
+        <span class="nav-label">Draft an Outcome Statement</span>
+        <span class="nav-desc">Guided · simple, spare, observable</span>
+      </span>
+    </a>
+    <a class="nav-item" data-panel="competing">
+      <span class="nav-icon">⚔️</span>
+      <span class="nav-text">
+        <span class="nav-label">Pressure-Test Competing Drivers</span>
+        <span class="nav-desc">What success costs each stakeholder</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Foundation &amp; Frame</div>
+    <a class="nav-item" data-panel="context">
+      <span class="nav-icon">🗂️</span>
+      <span class="nav-text">
+        <span class="nav-label">Build a Context Diagram</span>
+        <span class="nav-desc">Map the domains for requirements</span>
+      </span>
+    </a>
+    <a class="nav-item" data-panel="flex">
+      <span class="nav-icon">🧩</span>
+      <span class="nav-text">
+        <span class="nav-label">Flex the Plan to Problem Type</span>
+        <span class="nav-desc">Simple, complicated, or complex</span>
+      </span>
+    </a>
+    <a class="nav-item" data-panel="scenarios">
+      <span class="nav-icon">🎬</span>
+      <span class="nav-text">
+        <span class="nav-label">Draft Scenarios</span>
+        <span class="nav-desc">Real situations, exception paths</span>
+      </span>
+    </a>
+    <a class="nav-item" data-panel="stories">
+      <span class="nav-icon">👤</span>
+      <span class="nav-text">
+        <span class="nav-label">Write User Stories</span>
+        <span class="nav-desc">An alternative to scenarios</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Requirements Elicitation</div>
+    <a class="nav-item" data-panel="intguide">
+      <span class="nav-icon">🎤</span>
+      <span class="nav-text">
+        <span class="nav-label">Build an Interview Guide</span>
+        <span class="nav-desc">Shaped to purpose, scaled to time</span>
+      </span>
+    </a>
+    <a class="nav-item" data-panel="roleplay">
+      <span class="nav-icon">🗣️</span>
+      <span class="nav-text">
+        <span class="nav-label">Practice the Interview</span>
+        <span class="nav-desc">Guided · AI plays your stakeholder</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Write &amp; Check Requirements</div>
+    <a class="nav-item" data-panel="evaluate">
+      <span class="nav-icon">🔍</span>
+      <span class="nav-text">
+        <span class="nav-label">Evaluate (and Fix) a Requirement</span>
+        <span class="nav-desc">Score it against the five qualities</span>
+      </span>
+    </a>
+    <a class="nav-item" data-panel="draftreqs">
+      <span class="nav-icon">✍️</span>
+      <span class="nav-text">
+        <span class="nav-label">Turn a Scenario into Requirements</span>
+        <span class="nav-desc">From story to shall statements</span>
+      </span>
+    </a>
+    <a class="nav-item" data-panel="setcheck">
+      <span class="nav-icon">✅</span>
+      <span class="nav-text">
+        <span class="nav-label">Check the Requirement Set</span>
+        <span class="nav-desc">Complete, consistent, prioritized</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Facilitate the Room</div>
+    <a class="nav-item" data-panel="derailers">
+      <span class="nav-icon">🧑‍🏫</span>
+      <span class="nav-text">
+        <span class="nav-label">Build a Facilitation Plan</span>
+        <span class="nav-desc">Handle the room you actually have</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Manage Change</div>
+    <a class="nav-item" data-panel="change">
+      <span class="nav-icon">🔀</span>
+      <span class="nav-text">
+        <span class="nav-label">Identify Impact of a Change</span>
+        <span class="nav-desc">Map the knock-on effects</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Prepare for Testing</div>
+    <a class="nav-item" data-panel="usecases">
+      <span class="nav-icon">📑</span>
+      <span class="nav-text">
+        <span class="nav-label">Turn Scenarios into Use Cases</span>
+        <span class="nav-desc">Main flow plus alternate branches</span>
+      </span>
+    </a>
+
+  </div>
+  <div class="sidebar-footer"><a href="index.html">&larr; Back to all resources</a></div>
+</nav>
+
+<div class="mobile-nav" id="mobileNav"></div>
+
+<main class="main" id="mainContent">
+
+  <div class="panel active" id="panel-intro">
+    <div class="section-number">Start Here</div>
+    <h2>How to Use This Library</h2>
+    <p class="lead-text">This library turns what you practiced in <em>Business Requirements Management</em> into prompts you can use on a real project, with Copilot.</p>
+    <p>It follows the same arc as the class: start with stakeholders, plan your approach, define success, build the foundation and frame, elicit, write and check requirements, facilitate the room, manage change, and prepare for testing. Use the menu on the left to jump to the step you need.</p>
+<p>Every prompt is tagged one of two ways:</p>
+<div class="callout"><div class="callout-label">Prompt to run</div><p>The AI produces something for you: a list, a draft, an analysis. Paste it in, fill the bracketed slots, and go.</p></div>
+<div class="callout callout-info"><div class="callout-label">Guided conversation</div><p>The AI leads a working conversation, asking one question at a time. It should not jump to a finished answer. You think out loud; it helps.</p></div>
+<h3>Where to start</h3>
+<p>Run <strong>Build Your Project Brief</strong> first — it is the last item in this Start Here section. Most prompts ask for that brief, and everything gets easier once you have it. Save it where you can reach it, or keep it in a Copilot Notebook.</p>
+<p>Then consider copy/pasting the <strong>Evaluate (and Fix) a Requirement</strong> prompt somewhere you can find it easily. It is the everyday workhorse: paste in any requirement and it scores that requirement against the five qualities from class, then suggests a cleaner version.</p>
+<h3>Keep the judgment</h3>
+<p>The AI drafts; you decide. Stakeholder lists, drivers, and requirements only count once real stakeholders have confirmed them. Treat everything these prompts produce as fodder for the conversation, not a substitute for it.</p>
+<div class="framing-quote">The most expensive project surprise is an overlooked or misunderstood stakeholder.</div>
+    <div class="panel-nav"><button class="panel-nav-btn hidden">&larr; Previous</button><button class="panel-nav-btn" onclick="goTo('habits')">Tip: Keep Chats Short &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-habits">
+    <div class="section-number">Start Here</div>
+    <h2>Tip: Keep Chats Short</h2>
+    <p class="lead-text">The single easiest way to get better answers: keep each chat focused on one task.</p>
+    <p>Long chats make it harder for the AI to remember what is important, which increases the chance of hallucination or output that is not useful. To fix this, start a new chat whenever you are switching topics or using a new prompt.</p>
+<h3>Carrying your context across chats</h3>
+<p>Because you will be starting fresh often, you need a way to give the AI your project background without retyping it. Two options:</p>
+<div class="example-block"><div class="example-label">Option A · Copilot Notebook</div><ul><li>Add your project brief and a few key project files once. Copilot stays grounded in them across every chat in that notebook, so you do not have to paste anything.</li></ul></div>
+<div class="example-block"><div class="example-label">Option B · Paste the brief</div><ul><li>If you are not using a notebook, keep your project brief handy and paste it wherever a prompt asks for it.</li><li>That is what the project brief line in these prompts is for.</li></ul></div>
+<p>Run <strong>Build Your Project Brief</strong> (the last item in Start Here) early. Everything else gets easier once you have that brief.</p>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('intro')">&larr; How to Use This Library</button><button class="panel-nav-btn" onclick="goTo('carry')">Carry Context to a New Chat &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-carry">
+    <div class="section-number">Start Here</div>
+    <h2>Carry Context to a New Chat</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">When a chat gets long, this writes a handoff summary you can paste as the first message in a fresh chat, so you pick up without re-explaining.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are helping me move from this chat to a fresh one without losing the thread.
+
+Task: Write a compact handoff summary of this conversation that I can paste as the first message in a new chat.
+
+Include:
+- What I am working on and the goal of this thread.
+- The key decisions or conclusions we reached.
+- Any important details, numbers, or constraints that came up.
+- What is still open, or what I was about to do next.
+
+Guidelines:
+- Keep it tight and skimmable. Bullets, not prose.
+- Write it as a briefing to a fresh AI chat, so it has everything it needs to continue.
+
+Write the handoff now.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('habits')">&larr; Tip: Keep Chats Short</button><button class="panel-nav-btn" onclick="goTo('brief')">Build Your Project Brief &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-brief">
+    <div class="section-number">Start Here</div>
+    <h2>Build Your Project Brief</h2>
+    <div class="kind-tag kind-guided">Guided conversation</div>
+    <p class="lead-text">Run this first. It interviews you about your project and writes a tight, reusable brief you can paste into the other prompts, or save in a Copilot Notebook.</p>
+    <div class="callout callout-info"><div class="callout-label">Guided conversation</div><p>The AI will lead, asking one question at a time. Answer as you go. It should not jump to a finished answer.</p></div>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are an experienced project consultant helping me capture the essentials of my project in a short, reusable brief.
+
+I want you to interview me, then write a clean project brief I can reuse across other prompts and chats.
+
+How to run this:
+- Lead a focused conversation. Ask me one question at a time and wait for my answer before the next. Do not write the brief until you have what you need.
+- Cover, in roughly this order: what the project is and the outcome it must deliver; the sponsor and key stakeholders and what each cares about; the timeline and any hard deadlines; the budget or resource picture; the current status and stage; the biggest risks or unknowns; and any constraints (tools, compliance, dependencies).
+- Ask a follow-up only where my answer is vague or leaves an obvious gap. Keep it moving. This should take a few minutes, not an interrogation.
+
+When you have enough, write the brief:
+- Use clear headers and short bullets. Keep it to about one page.
+- Write it so a colleague, or a fresh AI chat, could understand my project cold.
+- End with a one-line summary I can use as a quick reference.
+
+Guidelines:
+- Do not invent details. If I do not know something, mark it as open.
+- Plain language. No jargon I did not use myself.
+
+Start by asking your first question.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('carry')">&larr; Carry Context to a New Chat</button><button class="panel-nav-btn" onclick="goTo('stakeholders')">Find the Missed Stakeholders &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-stakeholders">
+    <div class="section-number">Start with Stakeholders</div>
+    <h2>Find the Missed Stakeholders</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">Missed requirements come from missed stakeholders. This prompt helps surface the people you are most likely to overlook.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a seasoned business analyst helping me build a thorough first-draft stakeholder list, including the people I am most likely to overlook.
+
+MY PROJECT BRIEF:
+[Paste your project brief here. If you saved it in a Copilot Notebook, tell me to use the brief in this notebook instead.]
+
+The principle: missed requirements come from missed stakeholders.
+
+How to run this:
+1. First, ask me 2 to 3 questions to understand my project well enough to do this well — for example, what changes and for whom, what systems or data are involved, and who is downstream of the result. Wait for my answers.
+2. Then produce an initial stakeholder list. For each stakeholder, tag which of these four tests they meet (one or more):
+   - You need their cooperation.
+   - Their requirements shape the solution.
+   - Their opposition can impact project success.
+   - Their work is impacted by what you build.
+
+Make the list:
+- Thorough. Include the obvious players and the easily forgotten ones: downstream report consumers, compliance and audit, people running workarounds or "secret spreadsheets" today, trainers and support staff, and anyone whose data feeds or is fed by the system.
+- Specific. Name roles precisely — "data architect," not "technical team"; "regional compliance lead," not "compliance."
+
+Guidelines:
+- Mark every entry as a hypothesis for me to confirm, not a fact.
+- End with the saturation technique I can use to validate and extend the list: ask each stakeholder, "Think forward to when we roll this out. Who would be upset if they had not been consulted?" Then ask each person they name the same question, and stop when the same names keep coming back.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('brief')">&larr; Build Your Project Brief</button><button class="panel-nav-btn" onclick="goTo('drivers')">Map Stakeholder Drivers &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-drivers">
+    <div class="section-number">Start with Stakeholders</div>
+    <h2>Map Stakeholder Drivers</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">Hypothesizes what each stakeholder is likely to care about based on their role, flags where drivers collide, and hands you a stakeholder register for your spreadsheet.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a business analyst helping me think through what my stakeholders are likely to care about, based on their role.
+
+MY PROJECT BRIEF:
+[Paste your project brief here. If you saved it in a Copilot Notebook, tell me to use the brief in this notebook instead.]
+
+MY STAKEHOLDER LIST:
+[Paste your stakeholder list, with a few words on each person or group's role.]
+
+Drivers are the specific things stakeholders care about, and they can shift during a project. Examples: minimizing change, protection from errors, finishing on time, gaining advanced capabilities, control, job security, trustworthy data.
+
+Task:
+1. For each stakeholder or group, hypothesize their two or three most likely drivers based on their role and what the project asks of them — not on guesses about their personality or background. Give a one-line reason tied to the role for each.
+2. Flag where drivers are likely to conflict between stakeholders. These are competing drivers I will need to escalate and resolve, or manage as risks.
+3. Output the result as a stakeholder register I can drop into a spreadsheet: one row per stakeholder, with columns for Stakeholder / Role, Likely Drivers, Why (tied to role), Potential Conflicts, and Questions to Validate. Format it as a table.
+
+Guidelines:
+- These are role-based hypotheses to validate in conversation, not conclusions about individuals. Say so at the top.
+- For each stakeholder, give me one or two interview questions I could use to confirm their actual drivers.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('stakeholders')">&larr; Find the Missed Stakeholders</button><button class="panel-nav-btn" onclick="goTo('plan')">Draft Your Requirements Plan &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-plan">
+    <div class="section-number">Plan Your Approach</div>
+    <h2>Draft Your Requirements Plan</h2>
+    <div class="kind-tag kind-guided">Guided conversation</div>
+    <p class="lead-text">Walks you through the full requirements process — define, gather, prioritize, verify, validate, test — one decision at a time, then writes a one-page plan.</p>
+    <div class="callout callout-info"><div class="callout-label">Guided conversation</div><p>The AI will lead, asking one question at a time. Answer as you go. It should not jump to a finished answer.</p></div>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are an experienced business analyst helping me plan how I will gather and manage requirements on my project, end to end.
+
+MY PROJECT BRIEF:
+[Paste your project brief here. If you saved it in a Copilot Notebook, tell me to use the brief in this notebook instead.]
+
+How to run this:
+- Interview me one question at a time, walking through the six phases of a requirements process. Do not write the plan until we have covered them all.
+- Define: How will I set high-level scope and out-of-scope items? How will I identify stakeholders, risks, and assumptions? What development approach and life cycle fits? What are the high-level business requirements and success factors?
+- Gather: Will I map current processes? How will I capture scenarios and user stories? How will I elicit stakeholder, solution (functional and non-functional), and transition requirements? Where will requirements be documented and stored (spreadsheet, requirements tool, or other)?
+- Prioritize: What method will I use, and who is in the room when priorities are set?
+- Verify: How will I check that requirements meet quality criteria before they are baselined?
+- Validate: How will I check that requirements meet the business goals and objectives?
+- Test: How will I keep traceability between requirements, product features, and tests, and what is my role in supporting testing?
+
+Keep it proportionate:
+- A simple project does not need a heavyweight plan, and a complicated process may need more structure and rigor. Flex the depth of each phase to the nature of my project, and ask me about that as we go.
+
+When we have covered the phases, write a one-page requirements management plan with clear headers, short bullets, and open items clearly marked. End with the three biggest risks to this plan and how I would spot them early.
+
+Start by asking your first question.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('drivers')">&larr; Map Stakeholder Drivers</button><button class="panel-nav-btn" onclick="goTo('outcome')">Draft an Outcome Statement &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-outcome">
+    <div class="section-number">Define Success</div>
+    <h2>Draft an Outcome Statement</h2>
+    <div class="kind-tag kind-guided">Guided conversation</div>
+    <p class="lead-text">Turns a fuzzy success definition like "a reliable and modern system" into an outcome statement that is simple, spare, and observable.</p>
+    <div class="callout callout-info"><div class="callout-label">Guided conversation</div><p>The AI will lead, asking one question at a time. Answer as you go. It should not jump to a finished answer.</p></div>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are helping me turn a fuzzy project goal into a clear outcome statement.
+
+What an outcome statement is:
+- It concisely summarizes the desired end state and the purpose behind it.
+- It is written in the present tense, as if we are living in the end state right now: "Success looks like [desired end state]."
+- It is simple, spare, and observable. An example of a good one: "Six months after go-live, supervisors can document safety incidents and share them with operations and compliance teams within one hour of occurrence, compared to the current average of 24 hours."
+
+THE FUZZY SUCCESS DEFINITION I AM STARTING FROM:
+[Paste what the sponsor or stakeholders have said success looks like, even if vague. For example, "a reliable and modern inventory system."]
+
+How to run this:
+- Interview me one question at a time. Push from adjectives to observable behavior. Cover: who can do what differently in the end state; what they can observe from their own seat; by when, and against what current baseline; what threshold or number would make it real; and what is deliberately NOT part of success this time.
+- When an answer is an adjective like "reliable," "modern," or "efficient," ask what someone would see or measure that proves it.
+
+When you have enough:
+- Draft two or three candidate outcome statements, present tense, simple, spare, observable.
+- Check each candidate against those three tests and say plainly where it falls short.
+- If I have more than one desired outcome, remind me that each outcome has the potential to compromise the others without clear prioritization, and ask me to rank them.
+
+End with the follow-up questions I should still take to my sponsor before treating this as agreed.
+
+Start by asking your first question.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('plan')">&larr; Draft Your Requirements Plan</button><button class="panel-nav-btn" onclick="goTo('competing')">Pressure-Test Competing Drivers &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-competing">
+    <div class="section-number">Define Success</div>
+    <h2>Pressure-Test Competing Drivers</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">Takes your success definition and asks, for each stakeholder: what does this cost them, or fail to give them? Conflicts surface now, while you can still act.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a candid advisor helping me pressure-test my project's definition of success before it hardens.
+
+MY PROJECT BRIEF:
+[Paste your project brief here. If you saved it in a Copilot Notebook, tell me to use the brief in this notebook instead.]
+
+THE SUCCESS DEFINITION / OUTCOME STATEMENT:
+[Paste it.]
+
+THE STAKEHOLDERS TO TEST IT AGAINST:
+[List the executives and stakeholder groups. For example: CFO, Compliance/Legal, Head of Field Operations, IT Security, a newly hired transformation executive.]
+
+Task: For each stakeholder, ask the class question: what does this definition of success cost them, or fail to give them?
+
+Produce a table with: stakeholder; what this definition costs them or fails to give them; how that is likely to show up (quiet resistance, escalation, competing requirements, scope pressure); and how serious it is.
+
+Then split the conflicts into two lists:
+1. Escalate and resolve now: conflicts that need a decision from the sponsor or between executives before requirements gathering goes further.
+2. Manage as risks: conflicts that cannot be resolved yet. Write each as a one-line risk statement I can put on the risk register.
+
+Guidelines:
+- Do not soften. The point is to surface the competing drivers now, while I can still act.
+- Where a conflict could be eased by rewording the outcome statement rather than changing the substance, suggest the rewording and say what it does and does not fix.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('outcome')">&larr; Draft an Outcome Statement</button><button class="panel-nav-btn" onclick="goTo('context')">Build a Context Diagram &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-context">
+    <div class="section-number">Foundation &amp; Frame</div>
+    <h2>Build a Context Diagram</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">The foundation. Drafts your context diagram in text form — the system in the middle, every entity around it, and the labeled relationships between — so you can see every domain where requirements must be gathered.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a business analyst helping me build a context diagram for my solution.
+
+What a context diagram is: one system in the middle, the people and systems outside it that interact with it, and a labeled arrow for each relationship. It sets the boundary between what is inside the system and what is outside. An entity can be a person, system, department, or external organization — anything the solution interacts with that needs requirements attached to it. The arrows label relationships, not just process steps: a single arrow might represent a piece of data, an action, or a process. The diagram is detailed enough when it captures a complete list of domains where requirements will need to be gathered.
+
+MY PROJECT BRIEF:
+[Paste your project brief here. If you saved it in a Copilot Notebook, tell me to use the brief in this notebook instead.]
+
+WHAT I KNOW SO FAR ABOUT THE SYSTEM AND WHO TOUCHES IT:
+[Anything you have: the entities you have identified, current systems, departments involved. A partial list is fine — finding the gaps is the point.]
+
+Task:
+1. Name the system in the middle.
+2. List the entities around it. Include the ones I gave you and add the ones I am likely missing. Check the commonly forgotten: compliance and audit, downstream reporting consumers, vendors and external organizations, adjacent systems that feed or consume data, support and help desk, and anyone running a workaround today.
+3. For each entity, describe its relationship(s) to the system as labeled arrows in this form: Entity -> System: [label]. System -> Entity: [label]. The label can name data, an action, or a process — whatever that arrow represents.
+4. Mark each entity I did not mention with [PROPOSED] so I can confirm or reject it.
+
+Guidelines:
+- The output should be clean enough that I can redraw it as a diagram on a whiteboard or slide in a few minutes.
+- End with: (a) any entities you suspect exist but cannot confirm from what I gave you, phrased as questions to take to stakeholders, and (b) the reminder question: "Does this capture every domain where requirements need to be gathered?"</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('competing')">&larr; Pressure-Test Competing Drivers</button><button class="panel-nav-btn" onclick="goTo('flex')">Flex the Plan to Problem Type &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-flex">
+    <div class="section-number">Foundation &amp; Frame</div>
+    <h2>Flex the Plan to Problem Type</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">Sorts the aspects of your project — often the relationships on your context diagram — into simple, complicated, and complex, then recommends how much requirements rigor each deserves.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a business analysis advisor helping me right-size my requirements approach.
+
+The depth and rigor of requirements gathering depends on the type of problem each part of the project is solving:
+- Simple: the path is clear and repeatable. Stay light. Discovery and documentation can be lighter; use templates or repeatable requirements where you can.
+- Complicated: expert-dependent, many moving parts, but figure-out-able. Increase rigor: SME interviews, current-state mapping, a fuller requirements set.
+- Complex: the path is not knowable up front; you learn as you go. Iterate: prototypes, focus groups, smaller execution iterations.
+
+MY PROJECT BRIEF:
+[Paste your project brief here. If you saved it in a Copilot Notebook, tell me to use the brief in this notebook instead.]
+
+MY CONTEXT DIAGRAM (if I have one):
+[Paste your context diagram entities and relationships. The "aspects" below often line up with the relationships on it.]
+
+By "aspect," I mean a distinct part of the work I would actually plan and manage — often one of the relationships or processes on the context diagram. For example, on an inventory project, "submit a work order" or "transfer spare parts between sites" are aspects. They are not all the same problem type: a documented, repeatable submission may be simple, while reconciling counts across sites whose numbers disagree may be complex.
+
+Task:
+1. Break my project into its main aspects, drawing on my context diagram where I gave you one.
+2. Sort each aspect into Simple, Complicated, or Complex, with a one-line reason.
+3. For each aspect, recommend the requirements approach that fits: how I should discover requirements there, how heavy the documentation should be, and what elicitation techniques fit.
+
+Guidelines:
+- If an aspect is a mix, say so and split it.
+- Watch for the traps: oversimplifying or under-specifying complicated problems has consequences; overplanning complex work creates false confidence and low awareness when requirements have changed. Flag any traps you see in my project.
+- Ask me up to two clarifying questions first only if you genuinely cannot sort the work without them. Otherwise, proceed.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('context')">&larr; Build a Context Diagram</button><button class="panel-nav-btn" onclick="goTo('scenarios')">Draft Scenarios &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-scenarios">
+    <div class="section-number">Foundation &amp; Frame</div>
+    <h2>Draft Scenarios</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">The frame. Drafts plain-language, real-life scenarios for one domain of your context diagram — graded against what makes a good scenario before they reach you, and weighted toward the exception paths that expose hidden requirements.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a business analyst helping me draft scenarios for requirements discovery.
+
+What a scenario is: a real-life, operational situation described in plain language. A good one names the role, the place, and the real conditions, plus the other specifics that drive requirements. For example: "Marcus, a field technician, is assigned a quarterly preventive maintenance task on a compressor unit at a station two hours out, where there is no cell or wifi coverage. He works through the checklist, records readings, notes the filters he replaced from truck stock, and leaves the site before he is back in coverage."
+
+MY PROJECT BRIEF:
+[Paste your project brief here. If you saved it in a Copilot Notebook, tell me to use the brief in this notebook instead.]
+
+THE DOMAIN I AM WORKING ON:
+[Name one entity or domain from your context diagram. For example, "Field Technician" or "Procurement."]
+
+Task: Draft 6 to 8 scenarios for this domain.
+- One or two should be the happy path.
+- The rest should be exceptions and non-happy paths: the part is not available, the approver is out, the connection drops, the data arrives wrong, the timing collides with something else. Exceptions are where the requirements hide.
+- Each scenario: a short title, then 3 to 6 sentences in plain language with a named role, a specific place or condition, and what happens. No requirements language yet — scenarios are a discovery tool.
+
+Before you show me a scenario, grade it against these criteria, and only present scenarios that pass (revise or drop the rest):
+- Specific: it names the role, the place, and the real conditions, not a generic situation.
+- Plain language: it reads as a story, not as a list of requirements or system behaviors.
+- Useful: it would plausibly surface a requirement — especially an exception a happy-path-only view would miss.
+- Grounded: it fits my project's reality. If you had to guess at an operational detail, mark it with [?] so I can correct it.
+
+After the scenarios:
+- For each, list what it would force a solution to handle, as a teaser for the requirements to come.
+- Remind me: enough scenarios is when new scenarios stop surfacing new requirements. And keep them — they pay off twice, including as vendor demo scripts where you ask how the tool handles each one out of the box, with configuration, or only with customization.
+- Ask which scenarios ring true, which are off, and offer to draft more for the gaps I name.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('flex')">&larr; Flex the Plan to Problem Type</button><button class="panel-nav-btn" onclick="goTo('stories')">Write User Stories &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-stories">
+    <div class="section-number">Foundation &amp; Frame</div>
+    <h2>Write User Stories</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">A lighter alternative to scenarios. Drafts user stories in the classic form — as a [role], I want [capability], so that [benefit] — to capture needs quickly from each user's point of view.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a business analyst helping me write user stories.
+
+What a user story is: a need stated from a particular user's point of view, in the form "As a [role], I want [capability], so that [benefit]." For example: "As a compliance specialist, I want to see which assets are at risk of exceeding acceptable late-maintenance thresholds so that I can escalate this to site supervisors." A user story is a lighter alternative to a scenario — use it when you want to capture needs quickly from each user's perspective rather than walking through full situations.
+
+MY PROJECT BRIEF:
+[Paste your project brief here. If you saved it in a Copilot Notebook, tell me to use the brief in this notebook instead.]
+
+THE DOMAIN I AM WORKING ON:
+[Name the domain or area from your context diagram, and the roles who interact with it.]
+
+Task: Draft 6 to 10 user stories for this domain.
+
+Guidelines:
+- Cover more than one role. If every story is from the same seat, say so and suggest whose perspective is missing.
+- The "so that" must carry real benefit. Reject circular benefits that just restate the want ("I want to export data so that I can export data"). Every benefit should answer: what does this let the person do, avoid, or decide?
+- Flag any story that is actually a business rule (a policy the solution must enforce) in disguise, and restate it as what it really is.
+- Mark anything you inferred rather than took from my materials with [PROPOSED].
+- End by asking which roles or situations I think are still uncovered, and offer to draft stories for them.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('scenarios')">&larr; Draft Scenarios</button><button class="panel-nav-btn" onclick="goTo('intguide')">Build an Interview Guide &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-intguide">
+    <div class="section-number">Requirements Elicitation</div>
+    <h2>Build an Interview Guide</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">Builds a question guide for a stakeholder interview or focus group — shaped to your purpose, scaled to your time, mixing fact-finding and deeper, probing questions.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are an experienced business analyst helping me build a question guide for a requirements interview.
+
+WHAT I AM TRYING TO ACCOMPLISH (my purpose):
+[Describe what this session is for — for example, "walk through the work-order approval process end to end" or "understand the pain points of the field technician group."]
+
+WHO WILL BE IN THE ROOM:
+[The role(s). It may be one person, or a group — a panel interview or a focus group. Note which.]
+
+MY PROJECT BRIEF (optional):
+[Paste it, or tell me to use the brief in my Copilot Notebook.]
+
+How to run this:
+1. First, ask me two things and wait for my answers: what outcome I want to walk away from this session with, and how long the session is.
+2. Then build the question guide.
+
+Build the guide to fit the purpose and the time:
+- Follow a logical flow. A session to walk through a process end to end needs a different question set than one to surface a user group's pain points. Shape the flow to the purpose I gave you.
+- Mix the question types. Not every question should be a deep, probing one. Open with fact-finding and level-setting questions to establish shared understanding, then move into the deeper questions that dig into drivers, frictions, and assumptions.
+- Scale the number of questions to the time I have, accounting for how much discussion each question is likely to generate. A 30-minute interview and a 90-minute workshop should not have the same number of questions.
+
+For the deeper questions, lean on what makes a good question: it invites engagement, even disagreement; it digs past the first answer (the five whys is one way); and it surfaces the buried assumptions that sink projects. Include at least one question that surfaces workarounds, for example: "When the current system can't give you what you need, walk me through what you actually do."
+
+Close the guide with the saturation question: "Think forward to rollout. Who would be upset if they had not been consulted?"
+
+Also give me: a one-line statement of the session's purpose and desired outcome I can send with the invite, and one polite redirect line for when the conversation drifts into a gripe session.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('stories')">&larr; Write User Stories</button><button class="panel-nav-btn" onclick="goTo('roleplay')">Practice the Interview &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-roleplay">
+    <div class="section-number">Requirements Elicitation</div>
+    <h2>Practice the Interview</h2>
+    <div class="kind-tag kind-guided">Guided conversation</div>
+    <p class="lead-text">The AI plays your stakeholder — vague first answers, a workaround they don't volunteer, a driver they don't state — and you practice digging. Then it debriefs you.</p>
+    <div class="callout callout-info"><div class="callout-label">Guided conversation</div><p>This one is a role-play. The AI stays in character as your stakeholder until you say "debrief." Treat it like the real interview: dig past the first answer.</p></div>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are going to play a stakeholder so I can practice a requirements interview. I am the interviewer.
+
+MY PROJECT BRIEF:
+[Paste your project brief here. If you saved it in a Copilot Notebook, tell me to use the brief in this notebook instead.]
+
+Setup:
+- First, ask me two things: who you should play (role, and a temperament: cooperative, rushed, reserved, skeptical, or know-it-all — or tell you to pick), and what I want to get out of the interview. Then begin.
+
+How to play it:
+- Stay in character. Answer like a real, busy person: first answers are short and surface-level, you use your own shorthand, and you do not organize your thoughts for me.
+- Build in, without announcing them: one workaround you use today (a side spreadsheet, an off-system phone call, a manual fix) that you only reveal if I dig into how the work actually happens; one driver you care about (protection from errors, minimizing change, control, finishing on time) that you never state directly but that colors your answers; and one assumption you hold about the new solution that is plausibly wrong.
+- Do not make it easy, and do not be a cartoon. If I ask a good open question, reward it with real material. If I ask a leading or closed question, give me the thin answer it deserves.
+
+When I say "debrief" (or after about 12 exchanges, offer it):
+- Step out of character. Tell me: whether I dug past first answers or accepted them; whether I found your hidden workaround, your unstated driver, and your wrong assumption; which of my questions invited engagement and which put you on the defensive; and the single requirement I would most likely have missed based on how the interview went.
+- Show me two of my questions rewritten the way a skilled interviewer would have asked them.
+- Offer to run it again with a different temperament.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('intguide')">&larr; Build an Interview Guide</button><button class="panel-nav-btn" onclick="goTo('evaluate')">Evaluate (and Fix) a Requirement &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-evaluate">
+    <div class="section-number">Write &amp; Check Requirements</div>
+    <h2>Evaluate (and Fix) a Requirement</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">The everyday workhorse. Paste any requirement and it gets classified, scored against the five qualities from class, rewritten to pass, and checked for the business rules hiding underneath.</p>
+    <div class="callout"><div class="callout-label">The five qualities</div><p>Unambiguous &middot; Testable &middot; Independent &middot; Atomic &middot; Implementation-free. A requirement that "mostly works" fails.</p></div>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a tough, constructive requirements quality reviewer. Evaluate the requirement(s) below against the criteria from my training, then suggest a revised version of each.
+
+THE REQUIREMENT(S):
+[Paste one requirement, or several. Numbered is easiest.]
+
+CONTEXT (optional but helps):
+[A line or two on the project or system, or paste your project brief. If you saved it in a Copilot Notebook, tell me to use the brief in this notebook instead.]
+
+For each requirement, do four things:
+
+1. CLASSIFY IT. Which is it, and is it written in the right form for its type?
+- Business requirement: the why. Written as a "To..." statement. ("To reduce equipment downtime, the maintenance team needs field work completed and recorded reliably, even with no connectivity.")
+- Functional requirement: an action, process, or interaction. Written as a "shall" statement. ("The system shall not allow creation of a part transfer request if an associated work order is not in the system with a status of 'approved.'")
+- Non-functional requirement: a quality or environmental condition. Written as a constraint with a measurable threshold. ("On reconnect, the system shall sync a completed work order within 30 seconds on a standard field connection.")
+- Transition requirement: a temporary capability needed to get from current to future state. A plain sentence. ("Field technicians shall complete a two-hour training on the new work order app before go-live.")
+- Or actually a business rule (a policy, limit, or approval the organization enforces) wearing a requirement costume. If so, say so.
+
+2. SCORE IT against the five qualities. For each: pass or fail, with one line of evidence.
+- Unambiguous: one meaning, not two. Could three builders build three different things? Does it say exactly what happens in every case (reject vs. truncate vs. warn)?
+- Testable: you can check whether it was met. "Etc.," "quickly," "user-friendly," "robust," and "as appropriate" all fail.
+- Independent: it stands on its own without depending on a neighboring requirement to make sense.
+- Atomic: one requirement, not several bundled into one sentence. Bundles are harder to test.
+- Implementation-free: it states the capability or need, not the technology or solution. "Stored in a text file" locks the how.
+
+3. REWRITE IT. Give a revised version that passes all five qualities, in the correct form for its type.
+- If it fails Atomic, split it into separately numbered requirements.
+- Do not invent specifics I never gave you. Where a threshold, role, or behavior is missing, put a [bracketed placeholder] in the rewrite and list the exact questions I need to answer to fill it.
+
+4. FLAG THE BUSINESS RULES. Note any business rule (a policy, limit, approval, or calculation the solution must enforce) that the requirement implies but does not state explicitly — these deserve their own callout so they are captured, not assumed. Also note any assumption a stakeholder would need to confirm. (Data the requirement depends on can live inside the functional requirement; just make sure it is explicit rather than implied.)
+
+Guidelines:
+- Be a tough grader. The fix for ambiguity is to say exactly what happens and name every case.
+- If I pasted several requirements, evaluate each one, then end with any inconsistencies or overlaps between them.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('roleplay')">&larr; Practice the Interview</button><button class="panel-nav-btn" onclick="goTo('draftreqs')">Turn a Scenario into Requirements &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-draftreqs">
+    <div class="section-number">Write &amp; Check Requirements</div>
+    <h2>Turn a Scenario into Requirements</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">Walks a scenario and extracts candidate requirements — functional, non-functional, business rules, transition — each traced back to the moment in the story it came from.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a business analyst helping me turn a scenario into candidate requirements.
+
+MY SCENARIO:
+[Paste the plain-language scenario.]
+
+CONTEXT (optional):
+[Paste your project brief. If you saved it in a Copilot Notebook, tell me to use the brief in this notebook instead.]
+
+Task: Walk the scenario moment by moment and extract what a solution must do or be to handle it. Sort what you find into:
+- Functional requirements: "shall" statements describing actions, processes, or interactions. Where a requirement depends on specific data being captured, stored, or displayed, make that data explicit inside the requirement rather than leaving it assumed.
+- Non-functional requirements: constraints and qualities. Where the scenario implies a threshold (how fast, how available, under what conditions) but does not state one, write the requirement with a [bracketed placeholder] rather than inventing a number.
+- Business rules: policies, approvals, limits, or calculations the scenario implies the organization enforces. Call these out separately so they are captured explicitly.
+- Transition requirements: anything temporary the scenario implies about getting from today to the future state (training, data conversion).
+
+For every item:
+- Make it meet the five qualities: unambiguous, testable, independent, atomic, implementation-free.
+- Trace it: quote the phrase or moment in the scenario it came from.
+
+Then:
+- List what the scenario implies but never says, as questions to take back to stakeholders.
+- Flag any part of the scenario that no requirement currently covers, so I can see the gap.
+
+Guidelines:
+- These are candidates for stakeholder validation, not finished requirements. Say so at the top of your output.
+- Number everything so I can reference items in follow-up.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('evaluate')">&larr; Evaluate (and Fix) a Requirement</button><button class="panel-nav-btn" onclick="goTo('setcheck')">Check the Requirement Set &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-setcheck">
+    <div class="section-number">Write &amp; Check Requirements</div>
+    <h2>Check the Requirement Set</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">One requirement can be perfect while the set fails. This checks the whole list: complete, consistent, prioritized — plus the non-functional coverage most sets forget.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a requirements quality reviewer checking a requirement SET, not just individual statements.
+
+MY REQUIREMENTS:
+[Attach the requirements list, numbered if possible. It is usually too long to paste, so attach the file.]
+
+WHAT TO CHECK AGAINST (attach whatever you have; more is better):
+[Your project brief, outcome statement, context diagram entities, scenarios, and stakeholder list. If these are saved in a Copilot Notebook, tell me to use the files in this notebook instead.]
+
+A good requirement set is complete (the important needs are all captured), consistent (requirements do not contradict each other), and prioritized (you can tell what matters most).
+
+Task:
+1. COMPLETE. Check coverage against what I gave you: Is every context diagram entity / domain represented? Does every scenario have requirements that address it? Is there non-functional coverage where it plausibly matters: performance, availability, scalability, security, recoverability, maintainability, compliance? List the gaps as specific missing-requirement candidates, not vague observations.
+2. CONSISTENT. Actively hunt for pairs that contradict, overlap, or would collide in practice (two requirements that route the same approval differently, timing requirements that cannot both hold). Quote both numbers in each conflict.
+3. PRIORITIZED. Can a reader tell what matters most? If not, say so and recommend a method to fix it (MoSCoW, forced ranking, or numerical groups).
+4. SWEEP. Flag individual requirements with vague qualifiers ("quickly," "user-friendly," "etc."), bundled statements, or solution lock-in, so I can run them through a full evaluation separately.
+5. BUSINESS RULES. List the business rules the set implies but never states explicitly.
+
+End with a short, ordered punch list: the five most important fixes, in the order I should tackle them.
+
+Guidelines:
+- Cite requirement numbers everywhere. No finding without a pointer.
+- Where you propose a missing requirement, draft it with [bracketed placeholders] rather than invented specifics.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('draftreqs')">&larr; Turn a Scenario into Requirements</button><button class="panel-nav-btn" onclick="goTo('derailers')">Build a Facilitation Plan &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-derailers">
+    <div class="section-number">Facilitate the Room</div>
+    <h2>Build a Facilitation Plan</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">Tell it who is in the room and it builds a facilitation plan: how to handle each person, the group dynamics to watch for, and the ground rules worth setting up front.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are an experienced facilitator helping me plan how to run a requirements meeting and handle the people in the room.
+
+THE MEETING:
+[What it is for, how long, in person or virtual.]
+
+WHO IS COMING:
+[List attendees by role. Where you know personalities or history, say so: who dominates, who goes quiet, who shoots ideas down, whose boss is in the room, who has a stake in the outcome.]
+
+Task:
+1. For each attendee (or type of attendee) I described, anticipate how they are likely to behave in this meeting and give me a facilitation tip for handling them well — how to draw them out, channel their energy, or keep them from derailing the room. Use whatever dynamics fit the people I described; do not force them into fixed categories.
+2. Call out the overall group dynamics to watch for, given this mix of people — for example, rank dynamics when a boss and their reports are both present, two functions with competing interests, or a room that will defer to the loudest voice.
+3. Give me up to five ground rules worth setting at the start for this group, with the sentence I would use to set each. Useful ones include a "one voice" rule and a visible turn-taking queue ("I've got Mary, then James, then you").
+4. Build in at least one structured way for the quieter people to contribute (round-robin, silent writing) rather than hoping they speak up.
+
+Guidelines:
+- Script the words, not just the strategy. In the moment, I need a sentence, not a principle.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('setcheck')">&larr; Check the Requirement Set</button><button class="panel-nav-btn" onclick="goTo('change')">Identify Impact of a Change &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-change">
+    <div class="section-number">Manage Change</div>
+    <h2>Identify Impact of Requirements Change</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">When a requirement changes, this helps you see everything it might touch. Paste the change, attach your baselined requirements, and it builds an impact map of the knock-on effects.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a business analyst helping me map the impact of a proposed change to a requirement, so I can see everything it might touch.
+
+THE REQUIREMENT THAT IS CHANGING:
+[Paste the specific requirement and what is being asked of it.]
+
+MY WORKING REQUIREMENTS LIST (the baselined set):
+[Attach or paste your current requirements list, so I can see the other requirements this might affect.]
+
+SUPPORTING MATERIALS (attach if available):
+[Your scenarios and context diagram. They help me trace knock-on effects.]
+
+How to run this:
+1. First, ask me a few clarifying questions — only as many as you need — to understand why the change came up and exactly what is being asked. Wait for my answers.
+2. Then build an impact map.
+
+The impact map should trace the knock-on effects of this change across everything I gave you:
+- Other requirements in the set that depend on, conflict with, or would need to change alongside this one. Quote their numbers or text.
+- Scenarios this change affects, including any exception paths it newly creates or breaks.
+- Context diagram entities and relationships it touches.
+- Business rules and data the change implies or disturbs.
+- Anything about the move to the future state it affects (training, transition, conversion).
+
+For each item, say how it is affected and how confident you are. Where you cannot tell from what I gave you, list it as something for me to go check rather than guessing.
+
+Present the result as a clear impact map: grouped by category, with the most significant ripple effects called out at the top.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('derailers')">&larr; Build a Facilitation Plan</button><button class="panel-nav-btn" onclick="goTo('usecases')">Turn Scenarios into Use Cases &rarr;</button></div>
+  </div>
+
+  <div class="panel" id="panel-usecases">
+    <div class="section-number">Prepare for Testing</div>
+    <h2>Turn Scenarios into Use Cases</h2>
+    <div class="kind-tag kind-do">Prompt to run</div>
+    <p class="lead-text">Groups your related scenarios into use cases — the straightforward path as the main flow, the variations and exceptions as alternate flows — the structured backbone builders and testers work from.</p>
+    <div class="prompt-card">
+      <div class="prompt-card-head"><span class="pc-label">Prompt</span><button class="pc-copy" onclick="copyPrompt(this)">Copy prompt</button></div>
+      <pre>You are a business analyst helping me turn my scenarios into use cases.
+
+What a use case is: a structured, step-by-step description of how a goal gets accomplished. Related scenarios belong together in one use case — the straightforward path is the main flow, and the variations and exceptions become alternate flows. A use case has this shape:
+- Name / Goal: what is being accomplished, in plain terms.
+- Actor: who performs it.
+- Preconditions: what must be true before it starts.
+- Main flow: the step-by-step happy path (Actor does X -> system does Y -> ...).
+- Alternate flows: the variations and exceptions, each tracing back to a scenario (for example: if stock is below the requested quantity, the system blocks the transfer and alerts the operator).
+- Postconditions: what is true once it is done.
+
+MY SCENARIOS:
+[Paste the related scenarios you want turned into use cases. If they are saved in a Copilot Notebook, tell me to use the files in this notebook instead.]
+
+Task:
+1. Group my scenarios into use cases. Scenarios that share a goal belong in one use case — the main path as the main flow, the rest as alternate flows. Tell me which scenarios you grouped together and why.
+2. Write each use case in the structure above.
+3. Where a scenario implies a step or condition that is missing, mark it with [?] rather than inventing it, and list what I need to confirm.
+
+Guidelines:
+- Keep the main flow to the clean, expected path. Push variations and exceptions into alternate flows so the use case stays readable.
+- If a set of scenarios does not actually share a goal, say so and keep them as separate use cases rather than forcing them together.
+- End by noting any goal that my scenarios only partly cover, so I can see where a scenario is still missing.</pre>
+    </div>
+    <div class="panel-nav"><button class="panel-nav-btn" onclick="goTo('change')">&larr; Identify Impact of a Change</button><button class="panel-nav-btn hidden">Next &rarr;</button></div>
+  </div>
+
+</main>
+</div>
+
+<script>
+
+  const panels = document.querySelectorAll('.panel');
+  const navItems = document.querySelectorAll('.nav-item');
+  const panelOrder = ['intro', 'habits', 'carry', 'brief', 'stakeholders', 'drivers', 'plan', 'outcome', 'competing', 'context', 'flex', 'scenarios', 'stories', 'intguide', 'roleplay', 'evaluate', 'draftreqs', 'setcheck', 'derailers', 'change', 'usecases'];
+  function goTo(id) {
+    panels.forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('panel-' + id);
+    if (target) { target.classList.add('active'); target.style.animation='none'; target.offsetHeight; target.style.animation=''; }
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.panel === id));
+    document.getElementById('mainContent').scrollTop = 0;
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.panel === id));
+  }
+  navItems.forEach(item => item.addEventListener('click', () => goTo(item.dataset.panel)));
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileLabels = {
+    'intro': 'How to Use',
+    'habits': 'Keep Chats Short',
+    'carry': 'Handoff',
+    'brief': 'Project Brief',
+    'stakeholders': 'Stakeholders',
+    'drivers': 'Drivers',
+    'plan': 'Req Plan',
+    'outcome': 'Outcome',
+    'competing': 'Competing',
+    'context': 'Context Diagram',
+    'flex': 'Problem Type',
+    'scenarios': 'Scenarios',
+    'stories': 'User Stories',
+    'intguide': 'Interview Guide',
+    'roleplay': 'Practice Interview',
+    'evaluate': 'Evaluate Req',
+    'draftreqs': 'Scenario to Reqs',
+    'setcheck': 'Set Check',
+    'derailers': 'Facilitation Plan',
+    'change': 'Change Impact',
+    'usecases': 'Use Cases'
+  };
+  panelOrder.forEach(id => {
+    const btn = document.createElement('button');
+    btn.className = 'mobile-nav-btn' + (id === panelOrder[0] ? ' active' : '');
+    btn.textContent = mobileLabels[id] || id;
+    btn.dataset.panel = id;
+    btn.addEventListener('click', () => goTo(id));
+    mobileNav.appendChild(btn);
+  });
+
+  function copyPrompt(btn){
+    var pre = btn.closest('.prompt-card').querySelector('pre');
+    var text = pre.textContent;
+    function done(){ var o=btn.textContent; btn.textContent='Copied'; btn.classList.add('copied'); setTimeout(function(){ btn.textContent=o; btn.classList.remove('copied'); },1600); }
+    if(navigator.clipboard){ navigator.clipboard.writeText(text).then(done,function(){fallback();}); } else { fallback(); }
+    function fallback(){ var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} document.body.removeChild(ta); done(); }
+  }
+
+</script>
+</body>
+</html>
