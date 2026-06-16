@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Five AI Stories Worth Knowing Right Now — How to AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --navy: #162431;
+    --orange: #EF811F;
+    --blue: #114973;
+    --red: #961B28;
+    --purple: #55233D;
+    --taupe: #ACA095;
+    --light-gray: #E7E6E6;
+    --bg: #F7F6F4;
+    --surface: #FFFFFF;
+    --text-primary: #162431;
+    --text-secondary: #3A4A5A;
+    --text-muted: #6B7A8A;
+    --border: #D9D5CF;
+    --border-light: #E7E6E6;
+    --orange-light: #FEF3E6;
+    --blue-light: #EAF0F7;
+    --purple-light: #F3EBF0;
+    --tag-tutorial: #2F7A4A;
+    --tag-tutorial-bg: #E6F5ED;
+    --tag-explainer: #114973;
+    --tag-explainer-bg: #EAF0F7;
+    --tag-news: #55233D;
+    --tag-news-bg: #F3EBF0;
+    --shadow-sm: 0 1px 3px rgba(22,36,49,0.06);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .top-bar { height: 4px; background: var(--orange); }
+
+  /* ── Header ── */
+  .site-header {
+    background: var(--navy);
+    padding: 0 48px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+  }
+
+  .logo-text {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 0.02em;
+  }
+
+  .logo-text span {
+    color: var(--orange);
+    font-weight: 400;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: var(--orange); }
+
+  /* ── Article ── */
+  .article-wrapper {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 48px 80px;
+    animation: fadeIn 0.4s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 4px;
+  }
+
+  .tag-tutorial { background: var(--tag-tutorial-bg); color: var(--tag-tutorial); }
+  .tag-explainer { background: var(--tag-explainer-bg); color: var(--tag-explainer); }
+  .tag-news { background: var(--tag-news-bg); color: var(--tag-news); }
+
+  .article-date {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .article-title {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 18px;
+  }
+
+  .article-subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 2px solid var(--orange);
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--orange);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+
+  .toc-title {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--orange);
+    margin-bottom: 12px;
+  }
+
+  .toc ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+  .toc li { margin-bottom: 8px; counter-increment: toc; }
+
+  .toc a {
+    font-size: 15px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .toc a::before {
+    content: counter(toc) ". ";
+    color: var(--orange);
+    font-weight: 700;
+  }
+
+  .toc a:hover { color: var(--orange); }
+
+  /* ── Body ── */
+  .article-body h2 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-top: 48px;
+    margin-bottom: 18px;
+    line-height: 1.2;
+    scroll-margin-top: 88px;
+  }
+
+  .article-body h3 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-top: 36px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .article-body p {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.8;
+  }
+
+  .article-body ul, .article-body ol {
+    margin-bottom: 20px;
+    padding-left: 24px;
+  }
+
+  .article-body li {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    line-height: 1.7;
+  }
+
+  .article-body strong { color: var(--text-primary); font-weight: 700; }
+
+  .article-body a {
+    color: var(--blue);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s;
+  }
+
+  .article-body a:hover { color: var(--orange); }
+
+  /* ── Lead text ── */
+  .lead-text {
+    font-size: 19px;
+    line-height: 1.7;
+    color: var(--navy);
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  /* ── Callout ── */
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 28px 0;
+    border-left: 4px solid var(--orange);
+    background: var(--orange-light);
+  }
+
+  .callout-label {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .callout p {
+    font-size: 15.5px;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+    line-height: 1.7;
+  }
+
+  .callout-warning { background: rgba(150, 27, 40, 0.04); border-left-color: var(--red); }
+  .callout-warning .callout-label { color: var(--red); }
+
+  .callout-info { background: var(--blue-light); border-left-color: var(--blue); }
+  .callout-info .callout-label { color: var(--blue); }
+
+  /* ── Mistakes list ── */
+  .mistakes {
+    list-style: none;
+    padding-left: 0;
+    margin: 24px 0;
+  }
+
+  .mistakes li {
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-left: 4px solid var(--red);
+    border-radius: var(--radius-sm);
+    padding: 18px 22px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(22,36,49,0.04);
+  }
+
+  .mistakes li strong {
+    display: block;
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 15.5px;
+    color: var(--navy);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .mistakes li p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+    line-height: 1.7;
+  }
+
+  /* ── Source line ── */
+  .source-note {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin-top: -6px;
+    margin-bottom: 24px;
+  }
+
+  /* ── Footer ── */
+  .site-footer {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 48px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .site-footer strong { color: var(--navy); }
+
+  @media (max-width: 600px) {
+    .article-wrapper { padding: 32px 20px 60px; }
+    .article-title { font-size: 28px; }
+    .site-header { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-text">THE PERSIMMON GROUP <span>How to AI</span></div>
+    </a>
+    <a class="back-link" href="index.html">&larr; Back to all resources</a>
+  </div>
+</header>
+
+<article class="article-wrapper">
+
+  <div class="article-meta">
+    <span class="tag tag-news">AI News</span>
+    <span class="article-date">June 16, 2026</span>
+  </div>
+
+  <h1 class="article-title">Five AI Stories Worth Knowing Right Now</h1>
+  <p class="article-subtitle">A quick roundup of what changed in the last couple of weeks: what's practical, what's coming, and what it means for your work.</p>
+
+  <nav class="toc">
+    <div class="toc-title">In this roundup</div>
+    <ol>
+      <li><a href="#kpmg">KPMG got caught publishing AI hallucinations</a></li>
+      <li><a href="#memory">ChatGPT is learning to remember you on its own</a></li>
+      <li><a href="#pmi">Project management just got its first global AI standard</a></li>
+      <li><a href="#copilot">Copilot is becoming a platform, not a chatbot</a></li>
+      <li><a href="#fable">The most powerful new AI model launched, then disappeared in three days</a></li>
+    </ol>
+  </nav>
+
+  <div class="article-body">
+
+    <!-- ═══ 1. KPMG ═══ -->
+    <h2 id="kpmg">1. KPMG got caught publishing AI hallucinations</h2>
+    <p>KPMG <a href="https://www.inc.com/georgia-fearn/kmpg-sells-ai-trust-to-clients-just-pulled-its-own-report-over-alleged-ai-hallucinations/91361031" target="_blank" rel="noopener">pulled one of its own reports</a> this month after investigators found it was riddled with AI fabrications. The report, on agentic AI and customer experience, looked authoritative. It wasn't. <strong>Of its 45 citations, only five pointed to real, intact sources.</strong> It found that another 28 contained paraphrased titles or fabricated components, while 12 were too vague or flawed to verify.</p>
+
+    <p>KPMG is the fourth professional-services firm caught this way in recent months. Deloitte refunded part of a government contract over hallucinations. EY retracted reports. Two law firms were sanctioned in court for citing cases that were never real.</p>
+
+    <p>There are three mistakes that are easy to make related to checking AI's work:</p>
+
+    <ul class="mistakes">
+      <li>
+        <strong>Mistake #1: We don't click the links and validate sources.</strong>
+      </li>
+      <li>
+        <strong>Mistake #2: We do click the links, but don't vet the source.</strong>
+        <p>When AI hands you a citation, the risk isn't only that it's fabricated. It's that it's weak. AI reaches for whatever sounds authoritative, which often means a vendor's marketing blog, a "top 50 stats" listicle, or a secondhand article summarizing someone else's research. None of those belong in a client deliverable. Before you use a source AI gives you, click through to it. Confirm it's real, primary, and actually says what the AI claims. If it traces back to a stat roundup, a vendor blog, or a secondary summary, find the original or drop it.</p>
+      </li>
+      <li>
+        <strong>Mistake #3: We don't check to see whether the AI summarized the link or lifted a quote verbatim without attribution.</strong>
+        <p>AI does not have a conscience. It will lift whole passages from sources without attribution or quotes. You can prompt against this behavior, but always check source material to ensure you aren't plagiarizing.</p>
+      </li>
+    </ul>
+
+    <!-- ═══ 2. ChatGPT memory ═══ -->
+    <h2 id="memory">2. ChatGPT is learning to remember you on its own</h2>
+    <p>For a while, ChatGPT only remembered what you explicitly told it to save. That has changed. It now takes notes on its own, building a picture of you and your work across conversations, so it doesn't need to be reminded who you are every time.</p>
+
+    <p>You have more control over this than most people realize, in two ways. First, you can manage it just by talking to it. Tell ChatGPT to remember something ("remember that I always want plain language, no jargon") or to drop something ("forget what I said about that project"), and it will. Second, and this is the part most people miss: you can open your settings and see everything ChatGPT has stored about you. Every entry is right there, and you can edit or delete any of it. If it's holding something that's wrong or out of date, you can fix it in seconds.</p>
+
+    <p>For anything you'd rather it not keep at all, use Temporary Chat. Nothing from those conversations is saved.</p>
+
+    <div class="callout">
+      <div class="callout-label">What it means for you</div>
+      <p>You have more say over what ChatGPT knows about you than most people realize. Open your memory settings once and look at what's there, clean up anything that's off, and from then on just shape it as you go by telling it what to keep and what to drop.</p>
+    </div>
+
+    <!-- ═══ 3. PMI ═══ -->
+    <h2 id="pmi">3. Project management just got its first global AI standard</h2>
+    <p>On June 9, PMI released The Standard for Artificial Intelligence in Portfolio, Program, and Project Management. It's the first published global standard, and the first approved by ANSI, for applying AI to professional project work.</p>
+
+    <p>The premise is straightforward. Nearly every AI rollout inside an organization happens as a project, and until now the profession responsible for that work had no shared reference for doing it. The standard covers governance, human oversight, risk, ethics, data readiness, and staying aligned with rules like the EU AI Act.</p>
+
+    <p>We haven't worked through it closely yet, so we're not vouching for it either way. It's new, it's relevant to what we do, and it's worth knowing it's out there.</p>
+
+    <div class="callout">
+      <div class="callout-label">What it means for you</div>
+      <p>If you work in project delivery, take a look. PMI is offering complimentary digital access, and there's a companion certification (PMI-CPMAI) for anyone who wants to go deeper. If you read it, share what you think with the team. It would be genuinely useful to hear whether it holds up before any of us start leaning on it.</p>
+    </div>
+
+    <!-- ═══ 4. Copilot ═══ -->
+    <h2 id="copilot">4. Copilot is becoming a platform, not a chatbot</h2>
+    <p>A lot of our enterprise clients run on Microsoft, which means they run on Copilot. It helps to know what it does and how it lines up against the tools we already use.</p>
+
+    <p>Copilot is moving in the same direction as the rest of the field, just inside Microsoft's apps. It's added collaboration, with a "Groups" feature where up to 32 people can work alongside it in a shared space rather than each prompting alone. It's added action, with agents that can carry out tasks across web and desktop apps instead of only answering questions. And it offers a choice of underlying models, including OpenAI's latest and Anthropic's Claude (though not usually the latest models or custom effort levels available in the native platforms).</p>
+
+    <p>None of that is unique to Copilot. ChatGPT and Claude have their own versions of shared workspaces and task-running agents. The whole field is converging on the same set of capabilities. The useful part is recognition: when a client describes what Copilot can do, you'll see it's the same functionality you already know, packaged into the Microsoft tools they work in every day.</p>
+
+    <!-- ═══ 5. Fable 5 ═══ -->
+    <h2 id="fable">5. The most powerful new AI model launched, then disappeared in three days</h2>
+    <p>On June 9, Anthropic released Claude Fable 5, its most capable model yet, built for long, complex projects. Three days later it was gone. On June 12, the US government issued an export-control directive citing national security, and Anthropic suspended the model for every user worldwide to comply.</p>
+
+    <p>Anthropic is complying but publicly disagrees, describing the order as a misunderstanding tied to a narrow security concern, and says it's working to restore access. Every other Claude model stays available and unaffected, so anyone using Claude can keep working with the others.</p>
+
+    <div class="callout">
+      <div class="callout-label">What it means for you</div>
+      <p>When a new model is rolled out (or yanked back), developers and professionals who built applications, skills, and agents optimized for one model may find that it behaves differently in the next one. This problem gets worse when model availability, regulation, etc. is so unpredictable. Fortunately, most of the time that a new model is launched, the old ones remain available to use for a long period of time. This gives people time to decide how much to adjust their builds.</p>
+    </div>
+
+  </div>
+
+</article>
+
+<footer class="site-footer">
+  <p><strong>The Persimmon Group</strong> &middot; How to AI &middot; Last updated June 16, 2026</p>
+</footer>
+
+</body>
+</html>
