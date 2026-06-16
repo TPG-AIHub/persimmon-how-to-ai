@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Loupe — close reading</title>
+<style>
+  :root{
+    --desk:#15110c;          /* dark workbench */
+    --desk-2:#0e0b07;
+    --ink:#e9e2d4;           /* warm off-white text */
+    --ink-dim:#8a7f6c;
+    --glow:#ffca6e;          /* warm focused light */
+    --glow-soft:#ffb24d;
+    --flag:#ff6b5e;
+    --line:#2b2419;
+    --panel:#1d1810;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:radial-gradient(120% 80% at 50% -10%, #221a10 0%, var(--desk) 45%, var(--desk-2) 100%);
+    color:var(--ink);
+    font-family:Georgia, 'Times New Roman', serif;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+  button{font:inherit;color:inherit;cursor:pointer}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;height:52px;z-index:40;
+    display:flex;align-items:center;gap:12px;padding:0 14px;
+    background:linear-gradient(#1a140cdd,#1a140c99);backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{font-weight:700;letter-spacing:.04em;font-size:18px;color:var(--glow)}
+  .brand small{color:var(--ink-dim);font-weight:400;font-size:12px;margin-left:6px;font-family:system-ui,sans-serif}
+  .spacer{flex:1}
+  .tb-btn{
+    background:#241d12;border:1px solid var(--line);border-radius:8px;
+    padding:7px 12px;font-size:13px;font-family:system-ui,sans-serif;color:var(--ink);
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .tb-btn:hover{border-color:#4a3c24}
+  .tb-btn.on{background:#3a2c14;border-color:var(--glow-soft);color:var(--glow)}
+  .count{font-family:system-ui,sans-serif;font-size:13px;color:var(--ink-dim)}
+  .count b{color:var(--flag)}
+
+  /* ---------- paste view ---------- */
+  .paste-view{
+    position:fixed;inset:52px 0 0 0;z-index:30;display:none;
+    flex-direction:column;align-items:center;justify-content:center;padding:24px;
+  }
+  body.mode-paste .paste-view{display:flex}
+  .paste-card{width:min(760px,100%);}
+  .paste-card h1{font-size:26px;margin:0 0 6px;color:var(--ink)}
+  .paste-card p{margin:0 0 16px;color:var(--ink-dim);font-family:system-ui,sans-serif;font-size:14px;line-height:1.5}
+  .paste-area{
+    min-height:230px;max-height:46vh;overflow:auto;
+    background:#fbf7ee;color:#1a1a1a;border-radius:12px;padding:20px 22px;
+    font-family:Georgia,serif;font-size:16px;line-height:1.55;
+    border:1px solid #000;outline:none;
+  }
+  .paste-area:empty:before{content:attr(data-ph);color:#9a9486}
+  .privacy-note{
+    display:flex;gap:9px;align-items:flex-start;
+    margin:0 0 16px;padding:10px 13px;
+    border:1px solid var(--line);border-radius:10px;
+    background:rgba(255,202,110,0.04);
+    font-family:system-ui,sans-serif;font-size:13px;line-height:1.5;color:var(--ink-dim);
+  }
+  .privacy-note .lock{color:var(--glow-soft);flex-shrink:0;font-size:14px;line-height:1.5}
+  .privacy-note strong{color:var(--ink);font-weight:600}
+  .bookmark-tip{margin:14px 0 0;font-family:system-ui,sans-serif;font-size:12.5px;color:var(--ink-dim)}
+  .bookmark-tip b{color:var(--glow-soft);font-weight:600}
+  .paste-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .btn-primary{
+    background:linear-gradient(#ffc46b,#f0a23c);color:#2a1c06;border:none;border-radius:10px;
+    padding:12px 20px;font-size:15px;font-weight:700;font-family:system-ui,sans-serif;
+  }
+  .btn-ghost{background:#241d12;border:1px solid var(--line);border-radius:10px;padding:12px 18px;font-family:system-ui,sans-serif}
+
+  /* ---------- reader (loupe + whole) ---------- */
+  .reader{position:fixed;inset:52px 0 0 0;z-index:10;display:none}
+  body.mode-loupe .reader, body.mode-whole .reader{display:block}
+  .scroller{position:absolute;inset:0;overflow:auto}
+  body.mode-loupe .scroller{overflow:hidden}
+
+  #doc{
+    max-width:760px;margin:0 auto;padding:40vh 28px 50vh;
+    font-size:19px;line-height:1.7;
+  }
+  body.mode-loupe #doc{padding:50vh 28px 50vh}
+  #doc h1,#doc h2,#doc h3,#doc h4{line-height:1.3;margin:1.4em 0 .5em}
+  #doc h1{font-size:1.7em}#doc h2{font-size:1.4em}#doc h3{font-size:1.2em}
+  #doc p{margin:0 0 1em}
+  #doc ul,#doc ol{margin:0 0 1em;padding-left:1.5em}
+  #doc li{margin:.2em 0}
+  #doc blockquote{margin:0 0 1em;padding-left:1em;border-left:3px solid var(--line);color:var(--ink-dim);font-style:italic}
+  .sentence{border-radius:4px;transition:background .2s}
+
+  /* loupe mode: blur/dim the whole proof, glow behind active */
+  body.mode-loupe #doc{filter:blur(3.2px) brightness(.42) saturate(.7);transition:filter .25s}
+  body.mode-loupe .sentence.active{
+    background:radial-gradient(closest-side, rgba(255,170,70,.55), rgba(255,170,70,0));
+    box-shadow:0 0 60px 30px rgba(255,170,70,.20);
+  }
+  /* whole mode: full contrast, flags visible, editable */
+  body.mode-whole #doc{filter:none;outline:none}
+  body.mode-whole .sentence.active{box-shadow:inset 0 -2px 0 rgba(255,180,80,.5)}
+  .sentence.flagged{box-shadow:inset 0 0 0 9999px rgba(255,107,94,.10);background:rgba(255,107,94,.12)}
+  body.mode-whole .sentence.flagged{border-bottom:2px solid var(--flag)}
+
+  /* ---------- the lens ---------- */
+  #lens{
+    position:fixed;z-index:20;left:50%;top:calc(50% + 26px);transform:translate(-50%,-50%);
+    width:min(720px,92vw);max-height:74vh;overflow:auto;display:none;
+    background:linear-gradient(#241b10ee,#1b140bf2);
+    border:1px solid #4a3a1e;border-radius:18px;
+    box-shadow:0 0 0 1px rgba(255,200,120,.10), 0 30px 90px rgba(0,0,0,.6), 0 0 120px rgba(255,170,70,.18);
+    padding:30px 34px;
+  }
+  body.mode-loupe #lens{display:block}
+  .lens-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;
+    font-family:system-ui,sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim)}
+  .lens-badge{padding:3px 9px;border:1px solid var(--line);border-radius:20px}
+  .lens-pos{color:var(--glow)}
+  .lens-flag{color:var(--flag);display:none}
+  #lens.is-flagged .lens-flag{display:inline}
+  .lens-text{
+    font-size:clamp(24px,4.4vw,40px);line-height:1.32;color:#fff6e6;outline:none;
+    text-shadow:0 0 30px rgba(255,180,90,.18);
+  }
+  .lens-text:focus{cursor:text}
+  .lens-text b,.lens-text strong{font-weight:800}
+  #lens[data-block="H1"] .lens-text,#lens[data-block="H2"] .lens-text,
+  #lens[data-block="H3"] .lens-text{font-weight:800;letter-spacing:.005em}
+  #lens[data-block="BLOCKQUOTE"] .lens-text{font-style:italic}
+  #lens[data-block="LI"] .lens-text:before{content:"•  ";color:var(--glow-soft)}
+  .lens-hint{margin-top:16px;font-family:system-ui,sans-serif;font-size:12px;color:var(--ink-dim)}
+  .lens-hint.editing{color:var(--glow)}
+
+  /* ---------- control bar ---------- */
+  .controls{
+    position:fixed;left:0;right:0;bottom:0;z-index:30;
+    display:none;align-items:center;justify-content:center;gap:10px;
+    padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+    background:linear-gradient(#0e0b07f2,#0e0b07cc);border-top:1px solid var(--line);
+  }
+  body.mode-loupe .controls, body.mode-whole .controls{display:flex}
+  .ctrl{
+    background:#241d12;border:1px solid var(--line);border-radius:12px;
+    min-width:54px;height:50px;padding:0 16px;font-family:system-ui,sans-serif;font-size:14px;
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  }
+  .ctrl:hover{border-color:#4a3c24}
+  .ctrl.big{background:linear-gradient(#3a2c14,#2a2010);border-color:#4a3c24;min-width:84px}
+  .ctrl.flag.on{color:var(--flag);border-color:var(--flag)}
+  .ctrl svg{width:18px;height:18px;fill:currentColor}
+  body.mode-whole .loupe-only{display:none}
+  .ico{font-size:18px}
+  .toast{
+    position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);
+    background:#2a2010;border:1px solid var(--glow-soft);color:var(--glow);
+    padding:10px 16px;border-radius:10px;font-family:system-ui,sans-serif;font-size:13px;
+    opacity:0;pointer-events:none;transition:.25s;z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (max-width:560px){
+    #doc{font-size:17px}
+    .ctrl span.label{display:none}
+    .ctrl{min-width:48px;padding:0 10px}
+  }
+</style>
+</head>
+<body class="mode-paste">
+
+  <div class="topbar">
+    <span class="brand">Loupe<small>close reading</small></span>
+    <span class="spacer"></span>
+    <span class="count" id="flagCount" title="flagged sentences"></span>
+    <button class="tb-btn" id="btnFont" title="Defamiliarize: cycle typefaces">Aa</button>
+    <button class="tb-btn" id="btnZoom" title="Toggle whole document (Esc)">Zoom out</button>
+    <button class="tb-btn" id="btnCopy" title="Copy edited text with formatting">Copy out</button>
+    <button class="tb-btn" id="btnNew" title="Paste a new draft">New</button>
+  </div>
+
+  <!-- PASTE -->
+  <div class="paste-view">
+    <div class="paste-card">
+      <h1>Paste your draft</h1>
+      <p>Paste from Word, Google Docs, or a Claude artifact — bold, italics, headings and lists come along. Then read it one sentence at a time, where skimming is impossible.</p>
+      <div class="privacy-note">
+        <span class="lock">🔒</span>
+        <span><strong>Private by design.</strong> Everything runs in your browser. Nothing you paste is uploaded or stored, and closing the tab clears it for good.</span>
+      </div>
+      <div class="paste-area" id="pasteArea" contenteditable="true" data-ph="Paste here…"></div>
+      <div class="paste-actions">
+        <button class="btn-primary" id="btnBegin">Begin close reading</button>
+        <button class="btn-ghost" id="btnSample">Load a sample</button>
+      </div>
+      <p class="bookmark-tip"><b>Tip:</b> bookmark this page so it's one click away next time you proofread.</p>
+    </div>
+  </div>
+
+  <!-- READER -->
+  <div class="reader">
+    <div class="scroller" id="scroller">
+      <div id="doc"></div>
+    </div>
+  </div>
+
+  <!-- LENS -->
+  <div id="lens">
+    <div class="lens-meta">
+      <span class="lens-badge" id="lensBadge">Sentence</span>
+      <span><span class="lens-flag">⚑ flagged · </span><span class="lens-pos" id="lensPos">0 / 0</span></span>
+    </div>
+    <div class="lens-text" id="lensText"></div>
+    <div class="lens-hint" id="lensHint">Tap the sentence to edit · → next · ← back · ⚑ flag</div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button class="ctrl" id="cPrev" title="Previous (←)">‹<span class="label">&nbsp;Back</span></button>
+    <button class="ctrl flag" id="cFlag" title="Flag (F)"><span class="ico">⚑</span><span class="label">&nbsp;Flag</span></button>
+    <button class="ctrl loupe-only" id="cEdit" title="Edit (Enter)"><span class="ico">✎</span><span class="label">&nbsp;Edit</span></button>
+    <button class="ctrl big" id="cNext" title="Next (→ / Space)"><span class="label">Next&nbsp;</span>›</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const doc = $('#doc'), scroller = $('#scroller'), lens = $('#lens');
+const lensText = $('#lensText'), lensBadge = $('#lensBadge'), lensPos = $('#lensPos'), lensHint = $('#lensHint');
+
+const FONTS = [
+  "Georgia, 'Times New Roman', serif",
+  "'Helvetica Neue', Arial, sans-serif",
+  "'Courier New', monospace",
+  "'Comic Sans MS', 'Segoe Print', cursive",
+  "Impact, 'Arial Narrow Bold', sans-serif",
+  "'Palatino Linotype', 'Book Antiqua', Palatino, serif"
+];
+const READING_FONT = "Georgia, 'Times New Roman', serif";
+
+let sentences = [];   // live array of .sentence spans, document order
+let current = 0;
+let mode = 'paste';   // paste | loupe | whole
+let defamiliarize = true;
+let editing = false;
+
+/* =========================================================
+   1.  SANITIZE pasted HTML  -> a clean allowed-tags tree
+   ========================================================= */
+const ALLOWED = new Set(['P','BR','STRONG','EM','U','A','H1','H2','H3','H4','H5','H6','UL','OL','LI','BLOCKQUOTE']);
+const TAGMAP  = { B:'STRONG', I:'EM', STRIKE:'EM', H5:'H4', H6:'H4' };
+const DROP     = new Set(['SCRIPT','STYLE','META','LINK','HEAD','TITLE','NOSCRIPT','IMG','SVG','TABLE','THEAD','TBODY','TR','TD','TH']);
+
+function cleanInto(src, dest){
+  src.childNodes.forEach(node=>{
+    if(node.nodeType === 3){                       // text
+      dest.appendChild(document.createTextNode(node.nodeValue));
+      return;
+    }
+    if(node.nodeType !== 1) return;                // comments etc.
+    const tag = node.tagName.toUpperCase();
+    if(DROP.has(tag)) return;
+    const mapped = TAGMAP[tag] || tag;
+    if(ALLOWED.has(mapped)){
+      const el = document.createElement(mapped);
+      if(mapped === 'A' && node.getAttribute('href')) el.setAttribute('href', node.getAttribute('href'));
+      cleanInto(node, el);
+      dest.appendChild(el);
+    } else {                                        // DIV, SPAN, FONT… -> unwrap
+      cleanInto(node, dest);
+    }
+  });
+}
+
+// Wrap stray inline/text content sitting directly under #doc into <p> blocks.
+function normalizeBlocks(root){
+  const BLOCK = new Set(['P','UL','OL','BLOCKQUOTE','H1','H2','H3','H4']);
+  const out = []; let buf = null;
+  [...root.childNodes].forEach(node=>{
+    const isBlock = node.nodeType===1 && BLOCK.has(node.tagName);
+    if(isBlock){ if(buf){out.push(buf);buf=null;} out.push(node); }
+    else {
+      if(node.nodeType===3 && !node.nodeValue.trim()) return;
+      if(node.nodeType===1 && node.tagName==='BR'){ return; }
+      if(!buf) buf = document.createElement('p');
+      buf.appendChild(node);
+    }
+  });
+  if(buf) out.push(buf);
+  root.innerHTML='';
+  out.forEach(n=>root.appendChild(n));
+}
+
+/* =========================================================
+   2.  SEGMENT each block with Intl.Segmenter + Range API
+   ========================================================= */
+const segmenter = ('Segmenter' in Intl)
+  ? new Intl.Segmenter(undefined, {granularity:'sentence'})
+  : null;
+
+// Titles & abbreviations that are (almost) never sentence-final. The browser's
+// ICU segmenter has no title dictionary and wrongly splits after "Dr." etc., so
+// we re-join those. NOTE: a.m./p.m./etc. are deliberately absent — they CAN end a
+// sentence, and the segmenter already places those boundaries correctly.
+const NONTERMINAL = new Set([
+  'mr','mrs','ms','dr','prof','sr','jr','st','mt','ste','messrs','mme','mlle',
+  'rev','fr','hon','pres','gen','gov','sen','rep','capt','sgt','lt','col','cmdr',
+  'supt','det','msgr','e.g','i.e','cf','vs','viz','al'
+]);
+function endsNonTerminal(str){
+  const t = str.replace(/\s+$/,'');
+  const m = t.match(/([A-Za-z][A-Za-z.]*)\.["')\]]?$/);
+  if(!m) return false;
+  const raw = m[1];
+  if(raw.length === 1 && raw === raw.toUpperCase()) return true;   // an initial, e.g. "J."
+  return NONTERMINAL.has(raw.toLowerCase().replace(/\.+$/,''));
+}
+
+function segmentBlock(block){
+  const text = block.textContent;
+  if(!text.trim()) return;                 // empty block: leave as-is, no sentence
+
+  // sentence [start,end) character offsets within the block's text
+  let parts;
+  if(segmenter){
+    parts = [...segmenter.segment(text)].map(s=>({start:s.index, end:s.index+s.segment.length, str:s.segment}));
+    // belt-and-suspenders: re-join breaks that fell after a non-terminal abbreviation
+    const merged = [];
+    for(const p of parts){
+      const prev = merged[merged.length-1];
+      if(prev && endsNonTerminal(prev.str)){ prev.end = p.end; prev.str += p.str; }
+      else merged.push({...p});
+    }
+    parts = merged;
+  } else {
+    parts = [{start:0,end:text.length,str:text}];   // graceful fallback: whole block = 1 sentence
+  }
+
+  // map char offset -> {textNode, offset}
+  const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+  const nodes = []; let n, acc = 0;
+  while((n = walker.nextNode())){ nodes.push({node:n, start:acc, end:acc+n.nodeValue.length}); acc += n.nodeValue.length; }
+  if(!nodes.length) return;
+  const locate = off => {
+    for(const e of nodes){ if(off <= e.end) return {node:e.node, offset: off - e.start}; }
+    const last = nodes[nodes.length-1]; return {node:last.node, offset:last.node.nodeValue.length};
+  };
+
+  const spans = [];
+  for(const p of parts){
+    if(!p.str.trim()) continue;            // pure-whitespace segment -> skip (its space rides on a neighbour)
+    const a = locate(p.start), b = locate(p.end);
+    const r = document.createRange();
+    r.setStart(a.node, a.offset); r.setEnd(b.node, b.offset);
+    const span = document.createElement('span');
+    span.className = 'sentence';
+    span.dataset.block = block.tagName;
+    span.appendChild(r.cloneContents());   // preserves inline <strong>/<em> partials
+    spans.push(span);
+  }
+  if(!spans.length) return;
+  block.textContent = '';
+  spans.forEach(sp=>block.appendChild(sp));
+}
+
+function segmentDoc(){
+  const SEL = 'p,li,h1,h2,h3,h4,blockquote';
+  [...doc.querySelectorAll(SEL)].forEach(b=>{
+    if(b.querySelector(SEL)) return;       // it's a container (e.g. blockquote>p) — its children get segmented
+    segmentBlock(b);
+  });
+  refreshSentences();
+}
+
+function refreshSentences(){
+  sentences = [...doc.querySelectorAll('.sentence')];
+  sentences.forEach((s,i)=>{ s.dataset.index = i; });
+  updateFlagCount();
+}
+
+/* =========================================================
+   3.  LOUPE navigation + lens rendering
+   ========================================================= */
+function blockLabel(tag){
+  return ({H1:'Heading',H2:'Heading',H3:'Heading',H4:'Heading',
+           LI:'List item',BLOCKQUOTE:'Quote',P:'Sentence'})[tag] || 'Sentence';
+}
+
+function renderLens(){
+  if(!sentences.length) return;
+  const span = sentences[current];
+  lens.dataset.block = span.dataset.block;
+  lensBadge.textContent = blockLabel(span.dataset.block);
+  lensPos.textContent = (current+1) + ' / ' + sentences.length;
+  lens.classList.toggle('is-flagged', span.classList.contains('flagged'));
+  $('#cFlag').classList.toggle('on', span.classList.contains('flagged'));
+  lensText.innerHTML = span.innerHTML;
+  lensText.style.fontFamily = defamiliarize ? FONTS[current % FONTS.length] : READING_FONT;
+}
+
+function setActive(i){
+  if(!sentences.length) return;
+  current = Math.max(0, Math.min(i, sentences.length-1));
+  sentences.forEach(s=>s.classList.remove('active'));
+  const span = sentences[current];
+  span.classList.add('active');
+  renderLens();
+  centerActive();
+}
+
+function centerActive(){
+  const span = sentences[current];
+  if(!span) return;
+  const sc = scroller.getBoundingClientRect();
+  const sp = span.getBoundingClientRect();
+  const delta = (sp.top - sc.top) - (scroller.clientHeight/2 - sp.height/2);
+  scroller.scrollTo({top: scroller.scrollTop + delta, behavior: mode==='loupe' ? 'smooth' : 'auto'});
+}
+
+function go(d){
+  if(editing) commitEdit();
+  setActive(current + d);
+}
+
+/* ---- flag ---- */
+function toggleFlag(){
+  const span = sentences[current];
+  if(!span) return;
+  span.classList.toggle('flagged');
+  renderLens();
+  updateFlagCount();
+}
+function updateFlagCount(){
+  const n = doc.querySelectorAll('.sentence.flagged').length;
+  $('#flagCount').innerHTML = n ? ('<b>⚑ '+n+'</b> flagged') : '';
+}
+
+/* ---- inline edit (in the lens) ---- */
+function startEdit(){
+  if(mode!=='loupe') return;
+  editing = true;
+  lensText.setAttribute('contenteditable','true');
+  lensText.focus();
+  // caret to end
+  const r = document.createRange(); r.selectNodeContents(lensText); r.collapse(false);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  lensHint.textContent = 'Editing — Enter or Done to save · Shift+Enter for a line break';
+  lensHint.classList.add('editing');
+}
+function commitEdit(){
+  if(!editing) return;
+  editing = false;
+  lensText.removeAttribute('contenteditable');
+  sentences[current].innerHTML = lensText.innerHTML;   // write back, formatting intact
+  lensHint.textContent = 'Tap the sentence to edit · → next · ← back · ⚑ flag';
+  lensHint.classList.remove('editing');
+}
+
+/* =========================================================
+   4.  Mode switching
+   ========================================================= */
+function enterLoupe(i){
+  if(editing) commitEdit();
+  mode = 'loupe';
+  document.body.className = 'mode-loupe';
+  doc.removeAttribute('contenteditable');
+  $('#btnZoom').textContent = 'Zoom out';
+  $('#btnZoom').classList.remove('on');
+  refreshSentences();
+  setActive(i==null ? current : i);
+  // re-center after layout settles
+  requestAnimationFrame(()=>{ requestAnimationFrame(centerActive); });
+}
+function enterWhole(){
+  if(editing) commitEdit();
+  mode = 'whole';
+  document.body.className = 'mode-whole';
+  doc.setAttribute('contenteditable','true');
+  $('#btnZoom').textContent = 'Zoom in';
+  $('#btnZoom').classList.add('on');
+  // keep the current sentence in view
+  const span = sentences[current];
+  if(span) span.scrollIntoView({block:'center'});
+}
+function toggleZoom(){ mode==='loupe' ? enterWhole() : (refreshSentences(), enterLoupe(current)); }
+
+/* =========================================================
+   5.  Copy out (formatting preserved)
+   ========================================================= */
+function buildExport(){
+  const clone = doc.cloneNode(true);
+  clone.querySelectorAll('.sentence').forEach(s=>{
+    const f = document.createDocumentFragment();
+    while(s.firstChild) f.appendChild(s.firstChild);
+    s.replaceWith(f);
+  });
+  return { html: clone.innerHTML, text: clone.textContent.replace(/\n{3,}/g,'\n\n').trim() };
+}
+async function copyOut(){
+  const {html, text} = buildExport();
+  try{
+    if(navigator.clipboard && window.ClipboardItem){
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html], {type:'text/html'}),
+        'text/plain': new Blob([text], {type:'text/plain'})
+      })]);
+    } else {
+      await navigator.clipboard.writeText(text);
+    }
+    toast('Copied with formatting — paste it back into your doc');
+  }catch(e){ toast('Copy failed: '+e.message); }
+}
+
+/* =========================================================
+   6.  Boot: paste -> segment -> read
+   ========================================================= */
+function beginFrom(html){
+  const tmp = document.createElement('div');
+  cleanInto(new DOMParser().parseFromString(html, 'text/html').body, tmp);
+  doc.innerHTML = '';
+  cleanInto(tmp, doc);
+  normalizeBlocks(doc);
+  segmentDoc();
+  if(!sentences.length){ toast('Nothing to read — paste some text first'); return; }
+  current = 0;
+  enterLoupe(0);
+}
+
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+/* ---------- event wiring ---------- */
+$('#btnBegin').onclick = ()=>{
+  const a = $('#pasteArea');
+  const html = a.innerHTML.trim();
+  if(!html){ toast('Paste a draft first'); return; }
+  beginFrom(html);
+};
+$('#btnSample').onclick = ()=>{ $('#pasteArea').innerHTML = SAMPLE; };
+$('#btnNew').onclick = ()=>{ mode='paste'; document.body.className='mode-paste'; };
+$('#btnZoom').onclick = toggleZoom;
+$('#btnCopy').onclick = copyOut;
+$('#btnFont').onclick = ()=>{ defamiliarize=!defamiliarize; $('#btnFont').classList.toggle('on',defamiliarize); renderLens(); toast(defamiliarize?'Defamiliarize on':'Defamiliarize off'); };
+
+$('#cPrev').onclick = ()=>go(-1);
+$('#cNext').onclick = ()=>go(1);
+$('#cFlag').onclick = toggleFlag;
+$('#cEdit').onclick = ()=> editing ? commitEdit() : startEdit();
+
+lensText.addEventListener('click', ()=>{ if(!editing) startEdit(); });
+lensText.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); commitEdit(); }
+  if(e.key==='Escape'){ e.preventDefault(); commitEdit(); }
+});
+
+document.addEventListener('keydown', e=>{
+  if(mode==='paste') return;
+  if(editing) return;                          // let edits type freely
+  if(mode==='whole'){                          // only Esc/zoom in whole-doc; rest is normal editing
+    if(e.key==='Escape'){ e.preventDefault(); enterLoupe(current); }
+    return;
+  }
+  switch(e.key){
+    case 'ArrowRight': case 'ArrowDown': case ' ': e.preventDefault(); go(1); break;
+    case 'ArrowLeft':  case 'ArrowUp':           e.preventDefault(); go(-1); break;
+    case 'Enter':      e.preventDefault(); startEdit(); break;
+    case 'f': case 'F':e.preventDefault(); toggleFlag(); break;
+    case 'Escape':     e.preventDefault(); enterWhole(); break;
+    case 'Home':       e.preventDefault(); setActive(0); break;
+    case 'End':        e.preventDefault(); setActive(sentences.length-1); break;
+  }
+});
+
+/* swipe on phones (horizontal = navigate) */
+let tx=0, ty=0, tracking=false;
+scroller.addEventListener('touchstart', e=>{
+  if(mode!=='loupe') return; tracking=true; tx=e.touches[0].clientX; ty=e.touches[0].clientY;
+},{passive:true});
+scroller.addEventListener('touchend', e=>{
+  if(!tracking || mode!=='loupe') return; tracking=false;
+  const dx=e.changedTouches[0].clientX - tx, dy=e.changedTouches[0].clientY - ty;
+  if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)){ go(dx<0 ? 1 : -1); }
+  else if(Math.abs(dy) > 55 && Math.abs(dy) > Math.abs(dx)){ go(dy<0 ? 1 : -1); }
+},{passive:true});
+
+window.addEventListener('resize', ()=>{ if(mode==='loupe') centerActive(); });
+
+/* expose a tiny hook for automated segmentation tests */
+window.__loupe = { beginFrom, get sentences(){return sentences.map(s=>s.textContent);}, segmentBlockText(html){
+  const d=document.createElement('div'); d.innerHTML=html; const sel='p,li,h1,h2,h3,h4,blockquote';
+  [...d.querySelectorAll(sel)].forEach(b=>{ if(!b.querySelector(sel)) segmentBlock(b); });
+  return [...d.querySelectorAll('.sentence')].map(s=>s.innerHTML);
+}};
+
+/* ---------- sample draft (also exercises every test case) ---------- */
+const SAMPLE = `
+<h1>Why the rollout stalled</h1>
+<p>Leadership wanted a <strong>single source of truth</strong>, yet every team kept its own spreadsheet. Dr. Smith arrived at 9 a.m. She was early. Revenue grew 3.5% last quarter, which looked encouraging until you noticed the denominator had quietly changed.</p>
+<h2>What we actually learned</h2>
+<p>The pilot taught us three things that the dashboards never could. People trust a number they can <em>trace</em>; they ignore one they cannot. Process beats tooling whenever the two disagree.</p>
+<ul>
+  <li>Name one owner per metric, and put that name in writing.</li>
+  <li>Define "active user" once, then refuse to redefine it mid-quarter.</li>
+  <li>Review the denominator before you celebrate the ratio.</li>
+</ul>
+<blockquote>A metric without an owner is a rumour with a decimal point.</blockquote>
+<p>None of this is glamorous. It is, however, the difference between a report people act on and a report people quietly route to a folder they never open.</p>`;
+</script>
+</body>
+</html>
