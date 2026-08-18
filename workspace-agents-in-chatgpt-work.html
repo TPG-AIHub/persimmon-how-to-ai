@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workspace Agents in ChatGPT Work — How to AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --navy: #162431;
+    --orange: #EF811F;
+    --blue: #114973;
+    --red: #961B28;
+    --purple: #55233D;
+    --taupe: #ACA095;
+    --bg: #F7F6F4;
+    --surface: #FFFFFF;
+    --text-primary: #162431;
+    --text-secondary: #3A4A5A;
+    --text-muted: #6B7A8A;
+    --border: #D9D5CF;
+    --border-light: #E7E6E6;
+    --orange-light: #FEF3E6;
+    --blue-light: #EAF0F7;
+    --purple-light: #F3EBF0;
+    --sidebar-width: 300px;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'DM Sans', Arial, sans-serif;
+    color: var(--text-primary);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top-bar { height: 4px; background: var(--orange); flex-shrink: 0; }
+
+  .layout { display: flex; flex: 1; overflow: hidden; }
+
+  .sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 28px 24px 24px;
+    border-bottom: 2px solid var(--orange);
+  }
+
+  .sidebar-brand {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--taupe);
+    margin-bottom: 6px;
+  }
+
+  .sidebar-title {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.2;
+  }
+
+  .sidebar-title span { color: var(--orange); }
+
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+  .nav-group-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--taupe);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 20px 24px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); }
+  .nav-item.active { background: rgba(239, 129, 31, 0.08); border-left-color: var(--orange); }
+
+  .nav-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; width: 24px; text-align: center; }
+  .nav-text { flex: 1; }
+
+  .nav-label {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: rgba(255,255,255,0.6);
+    display: block;
+  }
+
+  .nav-item.active .nav-label { color: #FFFFFF; }
+
+  .nav-desc {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.4;
+    margin-top: 3px;
+    display: block;
+  }
+
+  .nav-item.active .nav-desc { color: rgba(255,255,255,0.5); }
+
+  .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 11px;
+    color: var(--taupe);
+    text-align: center;
+  }
+
+  .sidebar-footer a { color: var(--orange); text-decoration: none; }
+
+  .main { flex: 1; overflow-y: auto; background: var(--bg); scroll-behavior: smooth; }
+  .main::-webkit-scrollbar { width: 6px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+  .panel {
+    display: none;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 48px 80px;
+    animation: panelIn 0.3s ease both;
+  }
+
+  .panel.active { display: block; }
+
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-number {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .panel h2 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .panel h3 {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-top: 40px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .panel p {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.8;
+  }
+
+  .panel strong { color: var(--text-primary); font-weight: 700; }
+  .panel em { font-style: italic; }
+
+  .panel a { color: var(--orange); text-decoration: none; font-weight: 600; border-bottom: 1px solid rgba(239,129,31,0.35); }
+  .panel a:hover { border-bottom-color: var(--orange); }
+
+  .panel ul, .panel ol { margin-bottom: 20px; padding-left: 24px; }
+  .panel li { font-size: 16.5px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.7; }
+
+  .lead-text {
+    font-size: 19px;
+    line-height: 1.7;
+    color: var(--navy);
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  .framing-quote {
+    font-size: 20px;
+    font-style: italic;
+    color: var(--navy);
+    font-weight: 600;
+    padding: 20px 0 20px 24px;
+    border-left: 4px solid var(--orange);
+    margin: 28px 0;
+    line-height: 1.5;
+  }
+
+  .panel-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 2px solid var(--orange);
+  }
+
+  .panel-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .panel-nav-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .panel-nav-btn.hidden { visibility: hidden; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 28px 0;
+    border-left: 4px solid var(--orange);
+    background: var(--orange-light);
+  }
+
+  .callout-label {
+    font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .callout p { font-size: 15px; color: var(--text-secondary); margin-bottom: 0; line-height: 1.65; }
+
+  .callout-warning { background: rgba(150, 27, 40, 0.04); border-left-color: var(--red); }
+  .callout-warning .callout-label { color: var(--red); }
+  .callout-info { background: var(--blue-light); border-left-color: var(--blue); }
+  .callout-info .callout-label { color: var(--blue); }
+  .callout-purple { background: var(--purple-light); border-left-color: var(--purple); }
+  .callout-purple .callout-label { color: var(--purple); }
+
+  .example-block {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 22px 26px;
+    margin: 24px 0;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 1px 3px rgba(22,36,49,0.04);
+  }
+  .example-label { font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); margin-bottom: 10px; }
+  .example-block p { font-size: 15px; line-height: 1.65; color: var(--text-secondary); margin-bottom: 0; font-style: italic; }
+
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+  .grid-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 22px 24px; box-shadow: 0 1px 3px rgba(22,36,49,0.04); transition: border-color 0.2s; }
+  .grid-card:hover { border-color: var(--orange); }
+  .grid-card .card-emoji { font-size: 24px; margin-bottom: 10px; }
+  .grid-card h4 { font-family: 'Century Gothic', 'DM Sans', Arial, sans-serif; font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 8px; line-height: 1.3; }
+  .grid-card p { font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 0; }
+
+  .criteria-list { list-style: none; padding-left: 0; margin: 24px 0; }
+  .criteria-list li { font-size: 16px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6; padding-left: 0; }
+  .criteria-list li strong { color: var(--navy); }
+
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    html, body { overflow: auto; }
+    .layout { flex-direction: column; }
+    .main { overflow: visible; }
+    .panel { padding: 40px 24px 60px; }
+    .panel h2 { font-size: 26px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .mobile-nav { display: flex; }
+  }
+
+  .mobile-nav {
+    display: none;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--navy);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-nav-btn {
+    flex-shrink: 0;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    background: none;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    padding: 6px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .mobile-nav-btn.active { background: var(--orange); color: white; border-color: var(--orange); }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<div class="layout">
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">The Persimmon Group</div>
+    <div class="sidebar-title">Workspace Agents in <span>ChatGPT Work</span></div>
+  </div>
+  <div class="sidebar-nav" id="sidebarNav">
+
+    <a class="nav-item active" data-panel="intro">
+      <span class="nav-icon">🧭</span>
+      <span class="nav-text">
+        <span class="nav-label">Start Here</span>
+        <span class="nav-desc">Turning repeatable workflows into shareable help</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="what">
+      <span class="nav-icon">🤖</span>
+      <span class="nav-text">
+        <span class="nav-label">What Is a Workspace Agent?</span>
+        <span class="nav-desc">A shared AI worker designed for a defined workflow</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Where It Fits</div>
+
+    <a class="nav-item" data-panel="where">
+      <span class="nav-icon">🏢</span>
+      <span class="nav-text">
+        <span class="nav-label">Where Could We Use Agents?</span>
+        <span class="nav-desc">Project management, sales, instructional design</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="layers">
+      <span class="nav-icon">🧩</span>
+      <span class="nav-text">
+        <span class="nav-label">Agents and Skills</span>
+        <span class="nav-desc">They work best as layers rather than competitors</span>
+      </span>
+    </a>
+
+    <div class="nav-group-label">Building One</div>
+
+    <a class="nav-item" data-panel="configure">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-text">
+        <span class="nav-label">How to Configure One</span>
+        <span class="nav-desc">Seven steps, all in the ChatGPT web interface</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="practices">
+      <span class="nav-icon">✅</span>
+      <span class="nav-text">
+        <span class="nav-label">Best Practices</span>
+        <span class="nav-desc">Start narrow, map the workflow, test the hard cases</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="candidate">
+      <span class="nav-icon">🔎</span>
+      <span class="nav-text">
+        <span class="nav-label">Is This a Good First Agent?</span>
+        <span class="nav-desc">Six statements that mark a strong candidate</span>
+      </span>
+    </a>
+
+    <a class="nav-item" data-panel="simplest">
+      <span class="nav-icon">🎯</span>
+      <span class="nav-text">
+        <span class="nav-label">The Simplest Way to Think About It</span>
+        <span class="nav-desc">A skill knows the method. An agent owns the workflow.</span>
+      </span>
+    </a>
+
+  </div>
+  <div class="sidebar-footer"><a href="index.html">&larr; Back to all resources</a></div>
+</nav>
+
+<!-- ── Mobile nav (auto-built by script) ── -->
+<div class="mobile-nav" id="mobileNav"></div>
+
+<!-- ── Main ── -->
+<main class="main" id="mainContent">
+
+  <!-- INTRO -->
+  <div class="panel active" id="panel-intro">
+    <div class="section-number">Practical Guide</div>
+    <h2>Workspace Agents in ChatGPT Work</h2>
+    <p class="lead-text">A practical guide for turning repeatable Persimmon workflows into reliable, shareable help</p>
+    <p>Most of us use ChatGPT by opening a chat, asking for something, and reviewing the response. A workspace agent goes a step further: it is configured to take responsibility for a repeatable job, use the right tools and instructions, and produce a consistent result. Everything described here can be done in the ChatGPT web interface; no desktop app is required.</p>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn hidden">&larr; Previous</button>
+      <button class="panel-nav-btn" onclick="goTo('what')">What Is a Workspace Agent? &rarr;</button>
+    </div>
+  </div>
+
+  <!-- WHAT -->
+  <div class="panel" id="panel-what">
+    <div class="section-number">The Idea</div>
+    <h2>What is a workspace agent?</h2>
+    <p class="lead-text">A workspace agent is a shared AI worker designed for a defined workflow. You give it a role, clear instructions, approved apps, and the standards it should follow. It can then complete a multi-step task on demand or on a schedule, and it can be shared with teammates in your ChatGPT workspace.</p>
+    <p>A workspace agent can combine:</p>
+    <ul>
+      <li>Instructions that define its objective, steps, boundaries, and expected output.</li>
+      <li>Connected apps that let it read or act in approved systems such as calendars, email, shared drives, and project tools.</li>
+      <li>Skills that package a repeatable method, template, examples, or quality standard.</li>
+      <li>Memory that preserves useful context between runs for each individual user.</li>
+      <li>Schedules and sharing so the workflow can run routinely and support more than one person.</li>
+    </ul>
+    <div class="callout">
+      <div class="callout-label">The distinction</div>
+      <p>The important distinction is responsibility. A chat helps with the task in front of you. A workspace agent is set up to carry a particular workflow from input to finished output. It still needs human oversight, especially when information is sensitive or an action is difficult to reverse.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('intro')">&larr; Start Here</button>
+      <button class="panel-nav-btn" onclick="goTo('where')">Where Could We Use Agents? &rarr;</button>
+    </div>
+  </div>
+
+  <!-- WHERE -->
+  <div class="panel" id="panel-where">
+    <div class="section-number">Where It Fits</div>
+    <h2>Where could we use agents at Persimmon?</h2>
+    <p class="lead-text">The best opportunities are recurring workflows with recognizable inputs, a stable sequence of steps, and a useful deliverable. The goal is not to automate an entire function. It is to remove the repetitive coordination work around a focused outcome.</p>
+
+    <h3>Project management</h3>
+    <ul>
+      <li>Meeting-to-action workflow: turn notes into log entries (issues, decisions, actions, etc.), then update your personal to-do list based on the changes.</li>
+      <li>Project health check: compare the current plan, recent status reports, and open actions to flag stale work, missing owners, or schedule pressure.</li>
+    </ul>
+
+    <h3>Sales</h3>
+    <ul>
+      <li>Meeting prep: Look at incoming leads, gather recent account context, add relevant public news, and create a concise briefing.</li>
+      <li>Pre-proposals: Look at call notes and draft a pre-proposal based on a defined template and rules.</li>
+    </ul>
+
+    <h3>Instructional design</h3>
+    <ul>
+      <li>Content research: take a presentation outline or deck and research supporting statistics or studies, producing a list aligned to slide numbers.</li>
+      <li>Quality review: check a course or job aid for objective alignment, accessibility, consistency, tone, and missing review evidence, then produce an actionable revision list.</li>
+    </ul>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('what')">&larr; What Is a Workspace Agent?</button>
+      <button class="panel-nav-btn" onclick="goTo('layers')">Agents and Skills &rarr;</button>
+    </div>
+  </div>
+
+  <!-- LAYERS -->
+  <div class="panel" id="panel-layers">
+    <div class="section-number">Where It Fits</div>
+    <h2>Agents and Skills: how do they fit together?</h2>
+    <p class="lead-text">These tools overlap, but they solve different parts of the problem. They work best as layers rather than competitors.</p>
+    <ul class="criteria-list">
+      <li><strong>Workspace agent:</strong> use it when one AI worker should own a repeatable, multi-step workflow, use connected apps, and possibly run on a schedule or be shared with a team. A single agent can call multiple skills.</li>
+      <li><strong>Skill:</strong> use it when the method needs to be consistent. A skill is a reusable playbook containing instructions, templates, examples, reference material, or scripts. A skill can be used directly in ChatGPT or attached to an agent.</li>
+    </ul>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('where')">&larr; Where Could We Use Agents?</button>
+      <button class="panel-nav-btn" onclick="goTo('configure')">How to Configure One &rarr;</button>
+    </div>
+  </div>
+
+  <!-- CONFIGURE -->
+  <div class="panel" id="panel-configure">
+    <div class="section-number">Building One</div>
+    <h2>How to configure a workspace agent on the web</h2>
+    <p class="lead-text">Open ChatGPT in your browser, select Agents from the navigation, and choose the option to build a new agent. If you do not see Agents or cannot create one, contact your workspace administrator.</p>
+    <ol>
+      <li><strong>Describe the job in plain language.</strong> State the trigger, inputs, steps, output, destination, exclusions, and when the agent must stop and ask for help.</li>
+      <li><strong>Review the profile and instructions.</strong> Give the agent a specific name and description. Edit the generated instructions until the scope, sequence, quality bar, and boundaries are explicit.</li>
+      <li><strong>Connect only the apps it needs.</strong> Choose the minimum sources and actions required for the workflow. Confirm that each app has been approved for the workspace.</li>
+      <li><strong>Add skills, templates, and examples.</strong> Attach a focused skill when the agent should follow a repeatable Persimmon process or output format. Include one or two strong examples whenever possible.</li>
+      <li><strong>Decide whether memory is useful.</strong> Enable memory only when context from prior runs will improve future work. Remember that agent memory is per user, not shared across everyone using the agent.</li>
+      <li><strong>Test in Preview or Try in ChatGPT.</strong> Use realistic inputs, missing-data cases, permission failures, and examples that should be excluded. Compare the result with a strong human-created output.</li>
+      <li><strong>Deploy deliberately.</strong> After testing, choose the appropriate channel, schedule, and sharing settings. A new agent is private to its creator until sharing is enabled.</li>
+    </ol>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('layers')">&larr; Agents and Skills</button>
+      <button class="panel-nav-btn" onclick="goTo('practices')">Best Practices &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PRACTICES -->
+  <div class="panel" id="panel-practices">
+    <div class="section-number">Building One</div>
+    <h2>Best practices for reliable agents</h2>
+    <ul class="criteria-list">
+      <li><strong>Start narrow.</strong> One outcome, one audience, and one clear definition of done are easier to test and improve than a broad 'do everything' agent. An agent that produces class handouts (narrow) is stronger than one that builds outlines, creates decks, QCs classes, and critiques finished product (overly broad).</li>
+      <li><strong>Map the workflow first.</strong> Document the human process, decision points, exceptions, and required sources before asking the builder to automate it.</li>
+      <li><strong>Write for action.</strong> Specify what the agent should do, what it should not do, what evidence it must use, and the exact form of the finished deliverable.</li>
+      <li><strong>Build in human checkpoints.</strong> Require review before sending messages, updating records, publishing content, or making commitments on behalf of Persimmon.</li>
+      <li><strong>Test the uncomfortable cases.</strong> Try incomplete inputs, conflicting sources, unusual dates, restricted files, duplicate records, and requests outside scope.</li>
+      <li><strong>Improve from evidence.</strong> Save examples of good and poor results, refine the instructions or skill, and retest before expanding access or adding a schedule.</li>
+    </ul>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('configure')">&larr; How to Configure One</button>
+      <button class="panel-nav-btn" onclick="goTo('candidate')">Is This a Good First Agent? &rarr;</button>
+    </div>
+  </div>
+
+  <!-- CANDIDATE -->
+  <div class="panel" id="panel-candidate">
+    <div class="section-number">Building One</div>
+    <h2>Is this a good first agent?</h2>
+    <p class="lead-text">A workflow is a strong candidate when most of these statements are true:</p>
+    <ul>
+      <li>It happens often enough that the saved time will matter.</li>
+      <li>The required inputs can be identified and accessed through approved sources.</li>
+      <li>The major steps and exceptions can be explained clearly.</li>
+      <li>The finished output has a recognizable format and quality standard.</li>
+      <li>Errors can be spotted in review and corrected without serious harm.</li>
+      <li>A person or team can own testing, maintenance, and access decisions.</li>
+    </ul>
+    <div class="callout callout-warning">
+      <div class="callout-label">When to keep it human-led</div>
+      <p>If the work is highly ambiguous, rarely repeated, politically sensitive, or difficult to reverse, keep it in a human-led chat or use a skill to support the person doing the work. An agent should earn broader access through reliable results.</p>
+    </div>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('practices')">&larr; Best Practices</button>
+      <button class="panel-nav-btn" onclick="goTo('simplest')">The Simplest Way to Think About It &rarr;</button>
+    </div>
+  </div>
+
+  <!-- SIMPLEST -->
+  <div class="panel" id="panel-simplest">
+    <div class="section-number">In Short</div>
+    <h2>The simplest way to think about it</h2>
+    <div class="framing-quote">A skill knows the method. A workspace agent owns the workflow.</div>
+    <p>Start with a small, useful job; give the agent the minimum access it needs; test it against real examples; and keep a human accountable for the result.</p>
+
+    <div class="panel-nav">
+      <button class="panel-nav-btn" onclick="goTo('candidate')">&larr; Is This a Good First Agent?</button>
+      <button class="panel-nav-btn hidden">Next &rarr;</button>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  const panels = document.querySelectorAll('.panel');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const panelOrder = ['intro', 'what', 'where', 'layers', 'configure', 'practices', 'candidate', 'simplest'];
+
+  function goTo(id) {
+    panels.forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('panel-' + id);
+    if (target) {
+      target.classList.add('active');
+      target.style.animation = 'none';
+      target.offsetHeight;
+      target.style.animation = '';
+    }
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.panel === id));
+    document.getElementById('mainContent').scrollTop = 0;
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.panel === id);
+    });
+  }
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => goTo(item.dataset.panel));
+  });
+
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileLabels = {
+    intro: 'Start',
+    what: 'What',
+    where: 'Where',
+    layers: 'Agents & Skills',
+    configure: 'Configure',
+    practices: 'Practices',
+    candidate: 'Good First?',
+    simplest: 'In Short'
+  };
+
+  panelOrder.forEach(id => {
+    const btn = document.createElement('button');
+    btn.className = 'mobile-nav-btn' + (id === panelOrder[0] ? ' active' : '');
+    btn.textContent = mobileLabels[id] || id;
+    btn.dataset.panel = id;
+    btn.addEventListener('click', () => goTo(id));
+    mobileNav.appendChild(btn);
+  });
+</script>
+
+</body>
+</html>
